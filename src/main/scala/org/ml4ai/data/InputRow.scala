@@ -20,8 +20,8 @@ case class InputRow(
                      dependencyDistance: Double,
 
                      sentenceDistance: Double,
-                     ctx_dependencyTails:List[String],
-                     evt_dependencyTails:List[String]
+                     ctx_dependencyTails:Set[String],
+                     evt_dependencyTails:Set[String]
                    )
 
 object InputRow{
@@ -39,18 +39,20 @@ object InputRow{
     val setS = listS.toSet
     val allOtherFeatures = (head -- setS).toList
     var evt_dependencyTails = List()
-    var ctx_depenedencyTails = List()
+    var ctx_dependencyTails = List()
 
     for (a <- allOtherFeatures) {
+      val sub = a.substring(11, a.length)
+      //println(sub)
       if ((a contains "evtDepTail_") && (rowData(headers.indexOf(a)).toDouble > 0.0)) {
-        val sub = a.substring(11, a.length -1)
-        sub :: evt_dependencyTails
+
+        evt_dependencyTails :+ a
       }
 
       else if((a contains "ctxDepTail_") && (rowData(headers.indexOf(a)).toDouble > 0.0)) {
-        //println(a)
+        ctx_dependencyTails :+ a
       }
-        //a :: ctx_depenedencyTails
+
 
     }
     val pmcid = rowData(headers.indexOf("PMCID"))
@@ -65,9 +67,9 @@ object InputRow{
     val evtSentenceFirstPerson = rowData(headers.indexOf("evtSentenceFirstPerson")).toDouble
     val evtSentencePastTense = rowData(headers.indexOf("evtSentencePastTense")).toDouble
     val evtSentencePresentTense = rowData(headers.indexOf("evtSentencePresentTense")).toDouble
-    InputRow(sentencePos, pmcid, label, evt, ctx, closestCtx, contextFreq, evtNegationInTail, evtSentenceFirstPerson, evtSentencePastTense, evtSentencePresentTense, dependencyDistance,  sentenceDist, List(), List())
+    //InputRow(sentencePos, pmcid, label, evt, ctx, closestCtx, contextFreq, evtNegationInTail, evtSentenceFirstPerson, evtSentencePastTense, evtSentencePresentTense, dependencyDistance,  sentenceDist, Set(), Set())
 
-    //InputRow(sentencePos, pmcid, label, evt, ctx, closestCtx, contextFreq, evtNegationInTail, evtSentenceFirstPerson, evtSentencePastTense, evtSentencePresentTense, dependencyDistance,  sentenceDist, ctx_depenedencyTails, evt_dependencyTails)
+    InputRow(sentencePos, pmcid, label, evt, ctx, closestCtx, contextFreq, evtNegationInTail, evtSentenceFirstPerson, evtSentencePastTense, evtSentencePresentTense, dependencyDistance,  sentenceDist, ctx_dependencyTails.toSet, evt_dependencyTails.toSet)
   }
 
   def fromStream(stream:InputStream):Seq[InputRow] = {
