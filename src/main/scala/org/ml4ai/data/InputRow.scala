@@ -28,7 +28,7 @@ object InputRow{
   def apply(str:String, headers: Array[String]):InputRow = {
     // Parse the commas into tokens
     //val tok = Seq.empty[String]
-    //println(str)
+
 
     val rowData = str.split(",")
     val sentencePos = rowData(0).toInt
@@ -38,19 +38,19 @@ object InputRow{
     val listS = headers(0) :: listOfSpecificFeatures
     val setS = listS.toSet
     val allOtherFeatures = (head -- setS).toList
+
     var evt_dependencyTails = List()
     var ctx_dependencyTails = List()
 
     for (a <- allOtherFeatures) {
       val sub = a.substring(11, a.length)
-      //println(sub)
       if ((a contains "evtDepTail_") && (rowData(headers.indexOf(a)).toDouble > 0.0)) {
 
-        evt_dependencyTails :+ a
+        evt_dependencyTails :+ sub
       }
 
       else if((a contains "ctxDepTail_") && (rowData(headers.indexOf(a)).toDouble > 0.0)) {
-        ctx_dependencyTails :+ a
+        ctx_dependencyTails :+ sub
       }
 
 
@@ -67,8 +67,6 @@ object InputRow{
     val evtSentenceFirstPerson = rowData(headers.indexOf("evtSentenceFirstPerson")).toDouble
     val evtSentencePastTense = rowData(headers.indexOf("evtSentencePastTense")).toDouble
     val evtSentencePresentTense = rowData(headers.indexOf("evtSentencePresentTense")).toDouble
-    //InputRow(sentencePos, pmcid, label, evt, ctx, closestCtx, contextFreq, evtNegationInTail, evtSentenceFirstPerson, evtSentencePastTense, evtSentencePresentTense, dependencyDistance,  sentenceDist, Set(), Set())
-
     InputRow(sentencePos, pmcid, label, evt, ctx, closestCtx, contextFreq, evtNegationInTail, evtSentenceFirstPerson, evtSentencePastTense, evtSentencePresentTense, dependencyDistance,  sentenceDist, ctx_dependencyTails.toSet, evt_dependencyTails.toSet)
   }
 
@@ -76,7 +74,6 @@ object InputRow{
     val source = Source.fromInputStream(stream)
     val lines = source.getLines()
     val headers = lines.next() split (",")
-    //headers foreach println
     val ret = (lines map (l => InputRow(l, headers))).toList
     source.close()
     ret
