@@ -3,7 +3,7 @@ package org.ml4ai.data
 import java.io.InputStream
 
 import scala.io.Source
-
+import scala.collection.mutable.ListBuffer
 case class InputRow(
                      sentenceIndex:Int,
                      PMCID:String,
@@ -39,18 +39,21 @@ object InputRow{
     val setS = listS.toSet
     val allOtherFeatures = (head -- setS).toList
 
-    var evt_dependencyTails = List()
-    var ctx_dependencyTails = List()
+    var evt_dependencyTails = new ListBuffer[String]
+    var ctx_dependencyTails = new ListBuffer[String]
 
     for (a <- allOtherFeatures) {
       val sub = a.substring(11, a.length)
+
       if ((a contains "evtDepTail_") && (rowData(headers.indexOf(a)).toDouble > 0.0)) {
 
-        evt_dependencyTails :+ sub
+
+        evt_dependencyTails += sub
       }
 
       else if((a contains "ctxDepTail_") && (rowData(headers.indexOf(a)).toDouble > 0.0)) {
-        ctx_dependencyTails :+ sub
+
+        ctx_dependencyTails += sub
       }
 
 
