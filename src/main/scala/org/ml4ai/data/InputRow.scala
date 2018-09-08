@@ -9,7 +9,7 @@ case class InputRow(
                      sentenceIndex:Int,
                      PMCID:String,
 
-                     label: Boolean,
+                     label: Option[Boolean],
                      EvtID: String,
                      CtxID: String,
                      closesCtxOfClass: Double,
@@ -68,7 +68,7 @@ object InputRow{
 
     InputRow(sentencePos,
       pmcid,
-      label.toBoolean,
+      Some(label.toBoolean),
       evt,
       ctx,
       closestCtx.toDouble,
