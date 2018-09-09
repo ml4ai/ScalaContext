@@ -37,7 +37,6 @@ object Balancer {
   def randomRowSelection(rows: Iterable[InputRow], negsPerPos: Int): Iterable[InputRow] = {
     val pos_rows = rows.filter(_.label == Some(true))
     val neg_rows = rows.filter(_.label == Some(false))
-    //println("Rows size: \t " + rows.size + "\n Pos rows size: \t " + pos_rows.size + " \n neg rows size: \t " + neg_rows.size)
     val posLength = pos_rows.size
     val negLength = neg_rows.size
     val all_rows: Iterable[InputRow] = {
