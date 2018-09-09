@@ -4,7 +4,6 @@ import java.io.InputStream
 
 import scala.collection.mutable
 import scala.io.Source
-import scala.collection.mutable.ListBuffer
 case class InputRow(
                      sentenceIndex:Int,
                      PMCID:String,

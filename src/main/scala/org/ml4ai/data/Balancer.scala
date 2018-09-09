@@ -8,9 +8,29 @@ object Balancer {
     * @return A balanced collection of rows
     */
   def balanceByPaper(rows: Iterable[InputRow], negsPerPos: Int): Iterable[InputRow] = {
-    val randomRows = randomRowSelection(rows, negsPerPos)
-    //randomRows foreach println
-    rows
+
+    val groups = rows.groupBy(_.PMCID)
+    val groupByPMCID = groups.values
+    var allRows:Option[Iterable[InputRow]] = None
+    for (g <- groupByPMCID) {
+      allRows match {
+        case None => {
+          val random = randomRowSelection(g, negsPerPos)
+          allRows = Some(random)
+        }
+        case Some(s) => {
+          val chosenRows = randomRowSelection(g, negsPerPos)
+          s ++: chosenRows
+        }
+      }
+    }
+
+    def toBeReturned(x:Option[Iterable[InputRow]]) = x match {
+      case Some(a) => a
+      case None => rows
+    }
+
+    toBeReturned(allRows)
 
   }
 
@@ -25,7 +45,7 @@ object Balancer {
         if(numOfPos > posLength)
           throw new IllegalArgumentException("Requested balancing requires more pos examples than total present.")
         val shuffled = scala.util.Random.shuffle(pos_rows.toList)
-        val subShuffled = shuffled.filter(shuffled.indexOf(_) <= numOfPos - 1)
+        val subShuffled = shuffled.slice(0,numOfPos)
         neg_rows.toList ::: subShuffled
       }
       else {
@@ -33,11 +53,12 @@ object Balancer {
         if(numOfNeg > negLength)
           throw new IllegalArgumentException("Requested balancing requires more neg examples than total present.")
         val shuffled = scala.util.Random.shuffle(neg_rows.toList)
-        val subShuffled = shuffled.filter(shuffled.indexOf(_) <= numOfNeg - 1)
+        val subShuffled = shuffled.slice(0,numOfNeg)
         pos_rows.toList ::: subShuffled
       }
     }
     all_rows
+
   }
 }
 
