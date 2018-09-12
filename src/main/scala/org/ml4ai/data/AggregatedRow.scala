@@ -10,11 +10,11 @@ object AggregatedRow {
   // TODO: Code this with groupBy and mapValues
   // The key should be: PMCID, EvtID, CtxID
   // rows.groupBy(r => (r.PMCID, r.EvtID, r.CtxID))
-  def fromRows(rows:Iterable[InputRow]):Map[(String, String, String), AggregatedRow] = ???/*{
+  def fromRows(rows:Iterable[InputRow]):Map[(String, String, String), AggregatedRow] = {
     val groups = rows.groupBy(l => (l.PMCID, l.EvtID, l.CtxID))
+    groups mapValues createAggRow
 
-
-  }*/
+  }
 
  def createAggRow(rows: Seq[InputRow]):AggregatedRow = {
    val sentenceColl = rows map {r => r.sentenceDistance}
