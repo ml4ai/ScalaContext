@@ -66,8 +66,8 @@ object AggregatedRow {
        allAggregatedFeatures match {
          case None => Some(agg)
          case Some(s) => {
-          // **** Please refer to Balancer.scala for reference. The similar logic had worked just fine yesterday without issues
-           // Should be *** allAggregatedFeatures = Some(s ++ agg) ***  according to the correctness of code in Balancer.scala
+          // **** Please refer to Balancer.scala for reference. The similar logic had worked just fine with Balancer.scala without issues
+           // Should be *** allAggregatedFeatures = Some(s ++ agg) ***  according to Balancer class
            // check with Enrique
            //allAggregatedFeatures = Some(s ++ agg)
            Some(s ++ agg)
