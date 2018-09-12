@@ -68,8 +68,8 @@ object AggregatedRow {
       val evtDep = r.evt_dependencyTails
       val contextFeatures = makeAggrFeatureSet(ctxDep)
       val eventFeatures = makeAggrFeatureSet(evtDep)
-      allAggregatedFeatures ++ contextFeatures
-      allAggregatedFeatures ++ eventFeatures
+      allAggregatedFeatures ++= contextFeatures
+      allAggregatedFeatures ++= eventFeatures
     }
 
 
@@ -82,7 +82,7 @@ object AggregatedRow {
     set foreach { feature_name => {
       val agg = AggregatedFeature(feature_name, 1.0, 1.0, 1.0)
       toReturn += agg
-    }
+      }
     }
     toReturn
   }
@@ -97,7 +97,6 @@ object AggregatedRow {
 
   def oneHitAll(bools: Iterable[Option[Boolean]]): Boolean = {
 
-    //bools.exists { case Some(v) => v }
     val bList = bools map {b => b match {
       case Some(v) => v
       case None => false
