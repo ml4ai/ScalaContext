@@ -1,5 +1,5 @@
 package org.ml4ai.data
-
+import scala.collection.mutable
 case class AggregatedRow(featureGroups:Iterable[AggregatedFeature], label:Option[Boolean]) extends Iterable[(String, Double)]{
   def toFeatures: Iterable[(String, Double)] = featureGroups.flatten
 
@@ -51,66 +51,38 @@ object AggregatedRow {
 
    val label = rows map {r => r.label}
    val labelForGroup = oneHitAll(label)
+   val allAggregatedFeatures = new mutable.HashSet[AggregatedFeature]
+   allAggregatedFeatures += aggregatedSent
+   allAggregatedFeatures += aggregatedDep
+   allAggregatedFeatures += aggregatedPresent
+   allAggregatedFeatures += aggPast
+   allAggregatedFeatures += aggFirst
+   allAggregatedFeatures += aggNeg
+   allAggregatedFeatures += aggCon
+   allAggregatedFeatures += aggCtx
 
-   val allAggregatedFeatures: Option[Iterable[AggregatedFeature]] = None
-// The basic idea behind the following code is:
-   // We initialize an empty Iterable of Aggregated features, call it allAggregatedFeatures
-   // Each InputRow (rows) has a ctxDepTail list, and evtDepTail list. Each list has strings, i.e. the names of the features.
-   // We need to create aggregated features for each of these features, using values 1.0 for min, max and avg.
-   // for each of the aggregated feature thus obtained, we have to append it to the running iterable.
    for(r <- rows) {
-     val setOfCtxDep = r.ctx_dependencyTails
-     val setOfEvtDep = r.evt_dependencyTails
-     setOfCtxDep foreach {s => {
-       val agg = AggregatedFeature(s,1.0,1.0,1.0)
-       allAggregatedFeatures match {
-         case None => Some(agg)
-         case Some(s) => {
-          // **** Please refer to Balancer.scala for reference. The similar logic had worked just fine with Balancer.scala without issues
-           // Should be *** allAggregatedFeatures = Some(s ++ agg) ***  according to Balancer class
-           // check with Enrique
-           //allAggregatedFeatures = Some(s ++ agg)
-           Some(s ++ agg)
-         }
-       }
-     }}
-  // same logic as above
-     setOfEvtDep foreach { e =>
-       val aggr = AggregatedFeature(e,1.0,1.0,1.0)
-       allAggregatedFeatures match {
-         case None => Some(aggr)
-         case Some(evt) => {
-           Some(evt ++ aggr)
-         }
-       }
-     }
+      val ctxDep = r.ctx_dependencyTails
+      val evtDep = r.evt_dependencyTails
+      val contextFeatures = makeAggrFeatureSet(ctxDep)
+     val eventFeatures = makeAggrFeatureSet(evtDep)
+     allAggregatedFeatures ++ contextFeatures
+     allAggregatedFeatures ++ eventFeatures
    }
 
-   // Continuing the logic, Now we need to examine the allFeatures iterable. We are yet to add the features above, i.e. sentenceDistance, closestContext, etc.
-   // That is what we need to do in the next step.
-   // Suppose that for some row, both ctxDepTail and evtDepTail are empty. Then the aggregated row will only contain those 10 features that were specifically created.
-   // If they are not empty, then we need to append them to the list of above 10 particular features.
-   // After this step, we should have the correct state of allAggregatedFeatures, and are ready to return.
-   allAggregatedFeatures foreach println
-   allAggregatedFeatures match {
-     case None => Some(allAggregatedFeatures ++ aggregatedSent ++
-       aggregatedDep ++ aggregatedPresent ++ aggPast ++ aggFirst ++
-       aggNeg ++ aggCon ++ aggCtx)
-     case Some(s) => Some(s ::: List(aggregatedSent, aggregatedDep, aggregatedPresent, aggPast, aggFirst, aggNeg, aggCon, aggCtx))
 
-   }
-   // ToReturn: AggregatedRow
-   // For the return part, we should emphasize that allAggregatedFeatures was actually an optional value. It may be none or it may have a valid iterable.
-   // We need to examine the cases and return the proper instance of AggregatedRow
-
-   def toBeReturned(s:Option[Iterable[AggregatedFeature]]):AggregatedRow = {
-     case Some(a) => AggregatedRow(a, labelForGroup)
-     case None => AggregatedRow(None, labelForGroup)
-   }
-
-   toBeReturned(allAggregatedFeatures)
+   AggregatedRow(allAggregatedFeatures, labelForGroup)
  }
 
+
+  def makeAggrFeatureSet(set:Set[String]):mutable.HashSet[AggregatedFeature] = {
+    val toReturn = new mutable.HashSet[AggregatedFeature]
+    set foreach {feature_name => {
+      val agg = AggregatedFeature(feature_name, 1.0,1.0,1.0)
+      toReturn += agg
+    }}
+    toReturn
+  }
 
 
   def createStats(nums:Seq[Double]): List[Double] = {
