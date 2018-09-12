@@ -13,10 +13,9 @@ object AggregatedRow {
   def fromRows(rows:Iterable[InputRow]):Map[(String, String, String), AggregatedRow] = {
     val groups = rows.groupBy(l => (l.PMCID, l.EvtID, l.CtxID))
     groups mapValues createAggRow
-
   }
 
- def createAggRow(rows: Seq[InputRow]):AggregatedRow = {
+ def createAggRow(rows: Iterable[InputRow]):AggregatedRow = {
    val sentenceColl = rows map {r => r.sentenceDistance}
    val List(sent_min, sent_max, sent_avg) = createStats(sentenceColl)
    val aggregatedSent = AggregatedFeature("sentenceDistance", sent_avg, sent_min, sent_max)
@@ -85,14 +84,14 @@ object AggregatedRow {
   }
 
 
-  def createStats(nums:Seq[Double]): List[Double] = {
+  def createStats(nums:Iterable[Double]): List[Double] = {
     val min = nums.min
     val max = nums.max
     val avg = nums.sum/nums.size
     List(min,max,avg)
   }
 
-  def oneHitAll(bools:Seq[Option[Boolean]]):Option[Boolean] = {
+  def oneHitAll(bools:Iterable[Option[Boolean]]):Option[Boolean] = {
     bools foreach {l => if(l == Some(true)) Some(true)}
     Some(false)
   }
