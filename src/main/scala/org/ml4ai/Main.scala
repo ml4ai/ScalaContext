@@ -9,9 +9,9 @@ import data.AggregatedRow
 object Main extends App {
 
   val rows = InputRow.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/features.csv.gz")))
-  rows foreach println
+  //rows foreach println
   val balancedRows = Balancer.balanceByPaper(rows, 1)
   val aggregatedRows = AggregatedRow.fromRows(balancedRows)
-  aggregatedRows foreach println
+  //aggregatedRows foreach println
 
 }
