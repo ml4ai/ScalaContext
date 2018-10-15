@@ -1,5 +1,7 @@
 package org.ml4ai.data
 import scala.collection.mutable
+import smile.classification._
+
 case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRow]) extends Iterable[(Array[Int], Array[Int], Array[Int])]{
   def toFolds:Iterable[(Array[Int], Array[Int], Array[Int])] = new mutable.HashSet[(Array[Int], Array[Int], Array[Int])]()
   override def iterator:Iterator[(Array[Int], Array[Int], Array[Int])] = this.toFolds.iterator
@@ -29,8 +31,8 @@ object FoldMaker {
         val testingSet = testingSets(currentId)
         val otherIDs = rowPaperLabels.toSet -- Seq(currentId)
         val shuffled = scala.util.Random.shuffle(otherIDs)
-        val validationIds = shuffled.slice(0,valSize)
-        val trainingIds = shuffled.slice(valSize, shuffled.size)
+        val validationIds = shuffled.take(valSize)
+        val trainingIds = shuffled.drop(valSize)
         val validationSet = new mutable.HashSet[Int]()
         val trainingSet = new mutable.HashSet[Int]()
         rows.zipWithIndex.foreach {

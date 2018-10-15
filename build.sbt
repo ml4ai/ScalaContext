@@ -13,3 +13,5 @@ lazy val root = (project in file(".")).
       "com.typesafe" % "config" % "1.3.2"
     )
   )
+
+libraryDependencies += "com.github.haifengl" %% "smile-scala" % "1.5.1"

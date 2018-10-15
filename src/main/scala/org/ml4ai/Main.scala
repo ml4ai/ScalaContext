@@ -13,5 +13,6 @@ object Main extends App {
   val balancedRows = Balancer.balanceByPaper(rows, 1)
   val aggregatedRows = AggregatedRow.fromRows(balancedRows)
   val folds = FoldMaker.getFolds(aggregatedRows)
-
+  folds.foreach(x => println(x._1.mkString(" ")))
+  println(folds.size)
 }
