@@ -3,7 +3,7 @@ import scala.collection.mutable
 object Classifier extends ClassifierMask {
   override def fit(xTrain: Seq[AggregatedRow], yTrain: Seq[Boolean]): Seq[AggregatedRow] = xTrain
 
-  override def predict(xTest: Seq[AggregatedRow]): Seq[Boolean] = Seq(true)
+  override def predict(xTest: Seq[AggregatedRow]): Seq[Boolean] = List.fill(xTest.size)(true)
 
   def convertBooleansToInt(labels: Seq[Boolean]):Array[Int] = {
 
@@ -13,5 +13,12 @@ object Classifier extends ClassifierMask {
       case _ => 0
     })
     toReturn.toArray
+  }
+
+  def convertOptionalToBool(rows: Seq[AggregatedRow]): Seq[Boolean] = {
+    rows.map(x => x.label match {
+      case Some(x) => x
+      case _ => false
+    })
   }
 }
