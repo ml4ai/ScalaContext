@@ -1,5 +1,4 @@
 package org.ml4ai.data
-import scala.collection.mutable
 object Classifier extends ClassifierMask {
   override def fit(xTrain: Seq[AggregatedRow], yTrain: Seq[Boolean]): Seq[AggregatedRow] = xTrain
 

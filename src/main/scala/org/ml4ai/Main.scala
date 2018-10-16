@@ -16,18 +16,20 @@ object Main extends App {
   val balancedRows = Balancer.balanceByPaper(rows, 1)
   val aggregatedRows = AggregatedRow.fromRows(balancedRows)
   val folds = FoldMaker.getFolds(aggregatedRows)
-  val dataOnly = aggregatedRows.values.toSeq
+  val retainKeys = aggregatedRows mapValues(x => x)
+  val mapEntrySeq = retainKeys.toSeq
+  val dataOnly = mapEntrySeq.map(x => x._2)
   val giantTruthTestLabel = new mutable.ArrayBuffer[Boolean]()
   val giantPredTestLabel = new mutable.ArrayBuffer[Boolean]()
   val giantTruthValLabel = new mutable.ArrayBuffer[Boolean]()
   val giantPredValLabel = new mutable.ArrayBuffer[Boolean]()
   for((train,validate,test) <- folds) {
-      val trainingData = train.collect{case x:Int => dataOnly(x)}
+      val trainingData = train.collect{case x:Int => mapEntrySeq(x)}
       val validationData = validate.collect{case x:Int => dataOnly(x)}
       val testingData = test.collect{case x:Int => dataOnly(x)}
-      //val balancedTrainingData = Balancer.balanceByPaper(trainingData, 1)
-      val trainingLabels = Classifier.convertOptionalToBool(trainingData)
-      Classifier.fit(trainingData.toSeq, trainingLabels)
+      val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
+      val trainingLabels = Classifier.convertOptionalToBool(balancedTrainingData.toSeq)
+      Classifier.fit(balancedTrainingData.toSeq, trainingLabels)
 
       val currentTruthVal = Classifier.convertOptionalToBool(validationData)
       giantTruthValLabel ++= currentTruthVal

@@ -60,5 +60,55 @@ object Balancer {
     all_rows
 
   }
+
+
+  def balanceByPaperAgg(aggRows:Iterable[((String, String, String), AggregatedRow)], negsPerPos:Int): Iterable[AggregatedRow] = {
+    val groups = aggRows.groupBy(l => l._1._1)
+    val groupsById = groups.values
+    var allRows:Option[Iterable[AggregatedRow]] = None
+    for(g <- groupsById) {
+      allRows match {
+        case None => val random = randomRowAgg(g, negsPerPos)
+          allRows = Some(random)
+        case Some(s) => {
+          val chosenRows = randomRowAgg(g, negsPerPos)
+          allRows = Some(s ++ chosenRows)
+        }
+      }
+    }
+    def toBeReturned(x:Option[Iterable[AggregatedRow]]) = x match {
+      case Some(a) => a
+      case None => aggRows.map(x => x._2)
+    }
+
+    toBeReturned(allRows)
+  }
+
+  private def randomRowAgg(rows: Iterable[((String, String, String), AggregatedRow)], negsPerPos: Int): Iterable[AggregatedRow] = {
+    val pos_rows = rows.filter(_._2.label == Some(true)).map(x => x._2)
+    val neg_rows = rows.filter(_._2.label == Some(false)).map(x => x._2)
+    val posLength = pos_rows.size
+    val negLength = neg_rows.size
+    val all_rows: Iterable[AggregatedRow] = {
+      if (negLength < posLength) {
+        val numOfPos = negLength * negsPerPos
+        if(numOfPos > posLength)
+          throw new IllegalArgumentException("Requested balancing requires more pos examples than total present.")
+        val shuffled = scala.util.Random.shuffle(pos_rows.toList)
+        val subShuffled = shuffled.slice(0,numOfPos)
+        neg_rows.toList ::: subShuffled
+      }
+      else {
+        val numOfNeg = posLength * negsPerPos
+        if(numOfNeg > negLength)
+          throw new IllegalArgumentException("Requested balancing requires more neg examples than total present.")
+        val shuffled = scala.util.Random.shuffle(neg_rows.toList)
+        val subShuffled = shuffled.slice(0,numOfNeg)
+        pos_rows.toList ::: subShuffled
+      }
+
+    }
+    all_rows
+  }
 }
 
