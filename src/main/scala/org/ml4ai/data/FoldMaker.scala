@@ -50,4 +50,45 @@ object FoldMaker {
     }
     toReturn
   }
+
+  def getPossibleNumericFeatures(rows:Iterable[InputRow]): Seq[String] = {
+    val tempo = mutable.HashSet("closesCtxOfClass", "context_frequency",
+      "evtNegationInTail", "evtSentenceFirstPerson", "evtSentencePastTense", "evtSentencePresentTense", "sentenceDistance", "dependencyDistance")
+    val construct = new mutable.HashSet[String]
+    rows.foreach(x => {
+      x.evt_dependencyTails.foreach(y => construct += y)
+      x.ctx_dependencyTails.foreach(z => construct += z)
+    })
+    tempo.map{x => construct += x}
+    val toReturn = new mutable.HashSet[String]
+    construct.map{ x => {
+      val min = x + "_min"
+      toReturn += min
+      val max = x+"_max"
+      toReturn += max
+      val mean = x + "_mean"
+      toReturn += mean
+    }}
+    toReturn.toSeq
+  }
+
+  def createData(features:Seq[String], aggRows:Iterable[AggregatedRow]):Array[Array[Double]] = {
+    val row = new mutable.HashSet[Double]
+    val dataFrame = new mutable.HashSet[Array[Double]]
+    aggRows.map(x => {
+      val currentAggFeatures = x.featureGroups
+      val featureNames = currentAggFeatures.map(_.name).toSet
+      val absentFeatures = features.toSet -- (featureNames ++ Seq(""))
+      currentAggFeatures.map(c => {
+        row += c.mean
+        row += c.min
+        row += c.max
+      })
+      absentFeatures.map(x => row += 0.0)
+      val array = row.toArray
+      dataFrame += array
+      row.clear()
+    })
+    dataFrame.toArray
+  }
 }

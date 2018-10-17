@@ -14,6 +14,7 @@ object Main extends App {
 
   val rows = InputRow.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/features.csv.gz")))
   val balancedRows = Balancer.balanceByPaper(rows, 1)
+  val possibleFeatures = FoldMaker.getPossibleNumericFeatures(balancedRows)
   val aggregatedRows = AggregatedRow.fromRows(balancedRows)
   val folds = FoldMaker.getFolds(aggregatedRows)
   val retainKeys = aggregatedRows mapValues(x => x)
@@ -64,4 +65,7 @@ object Main extends App {
   val dummyResults = (("validation", precisionVal, recallVal, f1Val), ("test", precisionTest, recallTest, f1Test))
   scoreDictionary += ("dummy" -> dummyResults)
   println(scoreDictionary.values)
+
+
+
 }
