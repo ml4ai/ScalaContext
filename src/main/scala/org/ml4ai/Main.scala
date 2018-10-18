@@ -26,22 +26,28 @@ object Main extends App {
   val giantPredValLabel = new mutable.ArrayBuffer[Boolean]()
   for((train,validate,test) <- folds) {
       val trainingData = train.collect{case x:Int => mapEntrySeq(x)}
-      val validationData = validate.collect{case x:Int => dataOnly(x)}
-      val testingData = test.collect{case x:Int => dataOnly(x)}
       val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
+      val balancedTrainingFrame = FoldMaker.createData(possibleFeatures, balancedTrainingData)
       val trainingLabels = Classifier.convertOptionalToBool(balancedTrainingData.toSeq)
-      Classifier.fit(balancedTrainingData.toSeq, trainingLabels)
+
+      val validationData = validate.collect{case x:Int => dataOnly(x)}
+      val validationFrame = FoldMaker.createData(possibleFeatures, validationData)
+
+      val testingData = test.collect{case x:Int => dataOnly(x)}
+      val testingFrame = FoldMaker.createData(possibleFeatures, testingData)
+
+      Classifier.fit(balancedTrainingFrame, trainingLabels)
 
       val currentTruthVal = Classifier.convertOptionalToBool(validationData)
       giantTruthValLabel ++= currentTruthVal
 
-      val predValLabel = Classifier.predict(validationData)
+      val predValLabel = Classifier.predict(validationFrame)
       giantPredValLabel ++= predValLabel
 
       val currentTruthTest = Classifier.convertOptionalToBool(testingData)
       giantTruthTestLabel ++= currentTruthTest
 
-      val predTestLabel = Classifier.predict(testingData)
+      val predTestLabel = Classifier.predict(testingFrame)
       giantPredTestLabel ++= predTestLabel
   }
 

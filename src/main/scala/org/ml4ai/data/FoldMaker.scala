@@ -84,7 +84,8 @@ object FoldMaker {
         row += c.min
         row += c.max
       })
-      absentFeatures.map(x => row += 0.0)
+      var temp = List.fill(absentFeatures.size)(0.0)
+      row ++= temp
       val array = row.toArray
       dataFrame += array
       row.clear()
