@@ -7,9 +7,10 @@ import data.InputRow
 import data.Balancer
 import data.AggregatedRow
 import data.FoldMaker
-import data.Classifier
+import data.DummyClassifier
 import scala.collection.mutable
 import smile.validation._
+import data.GBRT
 object Main extends App {
 
   val rows = InputRow.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/features.csv.gz")))
@@ -20,52 +21,55 @@ object Main extends App {
   val retainKeys = aggregatedRows mapValues(x => x)
   val mapEntrySeq = retainKeys.toSeq
   val dataOnly = mapEntrySeq.map(x => x._2)
-  val giantTruthTestLabel = new mutable.ArrayBuffer[Boolean]()
-  val giantPredTestLabel = new mutable.ArrayBuffer[Boolean]()
-  val giantTruthValLabel = new mutable.ArrayBuffer[Boolean]()
-  val giantPredValLabel = new mutable.ArrayBuffer[Boolean]()
+  val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
+  val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
+  val giantTruthValLabel = new mutable.ArrayBuffer[Int]()
+  val giantPredValLabel = new mutable.ArrayBuffer[Int]()
   for((train,validate,test) <- folds) {
       val trainingData = train.collect{case x:Int => mapEntrySeq(x)}
+      println(trainingData.size)
       val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
       val balancedTrainingFrame = FoldMaker.createData(possibleFeatures, balancedTrainingData)
-      val trainingLabels = Classifier.convertOptionalToBool(balancedTrainingData.toSeq)
+      val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData.toSeq)
+      val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
 
       val validationData = validate.collect{case x:Int => dataOnly(x)}
       val validationFrame = FoldMaker.createData(possibleFeatures, validationData)
 
       val testingData = test.collect{case x:Int => dataOnly(x)}
       val testingFrame = FoldMaker.createData(possibleFeatures, testingData)
+      println("created validation and testing set and then retrieved data from it")
+      val gbrtInstance = GBRT.classifierInstance(balancedTrainingFrame, labelsToInt)
 
-      Classifier.fit(balancedTrainingFrame, trainingLabels)
+      //DummyClassifier.fit(balancedTrainingFrame, labelsToInt)
+      println("trained the model")
+      val currentTruthVal = DummyClassifier.convertOptionalToBool(validationData)
+      val currentTruthInt = DummyClassifier.convertBooleansToInt(currentTruthVal)
+      giantTruthValLabel ++= currentTruthInt
 
-      val currentTruthVal = Classifier.convertOptionalToBool(validationData)
-      giantTruthValLabel ++= currentTruthVal
-
-      val predValLabel = Classifier.predict(validationFrame)
+      //val predValLabel = DummyClassifier.predict(validationFrame)
+      val predValLabel = gbrtInstance.predict(validationFrame)
       giantPredValLabel ++= predValLabel
+      val currentTruthTest = DummyClassifier.convertOptionalToBool(testingData)
+      val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
+      giantTruthTestLabel ++= currentTruthTestInt
 
-      val currentTruthTest = Classifier.convertOptionalToBool(testingData)
-      giantTruthTestLabel ++= currentTruthTest
-
-      val predTestLabel = Classifier.predict(testingFrame)
+      //val predTestLabel = DummyClassifier.predict(testingFrame)
+      val predTestLabel = gbrtInstance.predict(testingFrame)
       giantPredTestLabel ++= predTestLabel
   }
 
   // converts boolean mappings to 1's and 0's in validation set and then calculates metrics
-  val giantTruthVal = Classifier.convertBooleansToInt(giantTruthValLabel)
-  val giantPredVal = Classifier.convertBooleansToInt(giantPredValLabel)
-  println(giantTruthVal.size == giantPredVal.size)
-  val precisionVal = precision(giantTruthVal, giantPredVal)
-  val recallVal = recall(giantTruthVal, giantPredVal)
-  val f1Val = f1(giantTruthVal, giantPredVal)
+  println(giantTruthValLabel.size == giantPredValLabel.size)
+  val precisionVal = precision(giantTruthValLabel.toArray, giantPredValLabel.toArray)
+  val recallVal = recall(giantTruthValLabel.toArray, giantPredValLabel.toArray)
+  val f1Val = f1(giantTruthValLabel.toArray, giantPredValLabel.toArray)
 
   // converts boolean mappings to 1's and 0's in test set and then calculates metrics
-  val giantTruthTest = Classifier.convertBooleansToInt(giantTruthTestLabel)
-  val giantPredTest = Classifier.convertBooleansToInt(giantPredTestLabel)
-  println(giantTruthTest.size == giantPredTest.size)
-  val precisionTest = precision(giantTruthTest, giantPredTest)
-  val recallTest = recall(giantTruthTest, giantPredTest)
-  val f1Test = f1(giantTruthTest, giantPredTest)
+  println(giantTruthTestLabel.size == giantPredTestLabel.size)
+  val precisionTest = precision(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  val recallTest = recall(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  val f1Test = f1(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
 
   var scoreDictionary = collection.mutable.Map[String, ((String, Double, Double, Double), (String, Double, Double, Double))]()
   val dummyResults = (("validation", precisionVal, recallVal, f1Val), ("test", precisionTest, recallTest, f1Test))
