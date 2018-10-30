@@ -49,6 +49,6 @@ object Utils {
     val recall = recall(countMap)
     val f1 = f1(countMap)
     val ac = accuracy(countMap)
-    Map(("precision_score" -> p), ("recall_score" -> r), ("f1_score" -> f1), ("accuracy_score" -> ac))
+    Map(("precision_score" -> p), ("recall_score" -> recall), ("f1_score" -> f1), ("accuracy_score" -> ac))
   }
 }
