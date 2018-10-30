@@ -27,7 +27,6 @@ object Main extends App {
   val giantPredValLabel = new mutable.ArrayBuffer[Int]()
   for((train,validate,test) <- folds) {
       val trainingData = train.collect{case x:Int => mapEntrySeq(x)}
-      //println(trainingData.size)
       val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
       val balancedTrainingFrame = FoldMaker.createData(possibleFeatures, balancedTrainingData)
       val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData.toSeq)
@@ -38,24 +37,23 @@ object Main extends App {
 
       val testingData = test.collect{case x:Int => dataOnly(x)}
       val testingFrame = FoldMaker.createData(possibleFeatures, testingData)
-      //println("created validation and testing set and then retrieved data from it")
-      //val gbrtInstance = GBRT.classifierInstance(balancedTrainingFrame, labelsToInt)
+
 
       DummyClassifier.fit(balancedTrainingFrame, labelsToInt)
-      //println("trained the model")
+
       val currentTruthVal = DummyClassifier.convertOptionalToBool(validationData)
       val currentTruthInt = DummyClassifier.convertBooleansToInt(currentTruthVal)
       giantTruthValLabel ++= currentTruthInt
 
       val predValLabel = DummyClassifier.predict(validationFrame)
-      //val predValLabel = gbrtInstance.predict(validationFrame)
+
       giantPredValLabel ++= predValLabel
       val currentTruthTest = DummyClassifier.convertOptionalToBool(testingData)
       val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
       giantTruthTestLabel ++= currentTruthTestInt
 
       val predTestLabel = DummyClassifier.predict(testingFrame)
-      //val predTestLabel = gbrtInstance.predict(testingFrame)
+
       giantPredTestLabel ++= predTestLabel
   }
 
