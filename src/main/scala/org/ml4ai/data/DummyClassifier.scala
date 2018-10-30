@@ -1,6 +1,6 @@
 package org.ml4ai.data
 object DummyClassifier extends ClassifierMask {
-  override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]): Array[Array[Double]] = xTrain
+  override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]) :Unit = ()
 
   override def predict(xTest:Array[Array[Double]]): Array[Int] = List.fill(xTest.size)(1).toArray
   def convertBooleansToInt(labels: Seq[Boolean]):Array[Int] = {
