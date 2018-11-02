@@ -72,9 +72,10 @@ object FoldMaker {
     toReturn.toSeq
   }
 
-  def createData(features:Seq[String], aggRows:Iterable[AggregatedRow]):Array[Array[Double]] = {
-    val row = new mutable.HashSet[Double]
+  def createData(features:Seq[String], aggRows:Iterable[AggregatedRow]):(Array[Array[Double]], Array[Int]) = {
+    val row = new mutable.ListBuffer[Double]
     val dataFrame = new mutable.HashSet[Array[Double]]
+    val sentDistIndices = new mutable.HashSet[Int]
     aggRows.map(x => {
       val currentAggFeatures = x.featureGroups
       val featureNames = currentAggFeatures.map(_.name).toSet
@@ -83,13 +84,22 @@ object FoldMaker {
         row += c.mean
         row += c.min
         row += c.max
+
+        val zip = currentAggFeatures.zipWithIndex
+        for((feat, index) <- zip) {
+          if(feat.name == "sentenceDistance") {
+            sentDistIndices += (index + 1)
+          }
+        }
       })
+      // need to confirm this logic with Enrique. The question is whether we should perform padding and then convert to array,
+      // or the other way around. The toArray conversion is meant to freeze the current order of elements in the "row" HashSet.
       var temp = List.fill(absentFeatures.size)(0.0)
       row ++= temp
       val array = row.toArray
       dataFrame += array
       row.clear()
     })
-    dataFrame.toArray
+    (dataFrame.toArray, sentDistIndices.toArray)
   }
 }
