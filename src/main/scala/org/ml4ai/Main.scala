@@ -80,14 +80,13 @@ object Main extends App {
   val f1Val = Utils.f1(valCounts)*/
 
   // converts boolean mappings to 1's and 0's in test set and then calculates metrics
-  println(giantTruthTestLabel.size == giantPredTestLabel.size)
   val testCounts = Utils.predictCounts(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
-  /*val precisionTest = Utils.precision(testCounts)
+  val precisionTest = Utils.precision(testCounts)
   val recallTest = Utils.recall(testCounts)
-  val f1Test = Utils.f1(testCounts)*/
-  val precisionTest = precision(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  val f1Test = Utils.f1(testCounts)
+  /*val precisionTest = precision(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
   val recallTest = recall(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
-  val f1Test = f1(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  val f1Test = f1(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)*/
 
   var scoreDictionary = collection.mutable.Map[String, ((String, Double, Double, Double), (String, Double, Double, Double))]()
   //val dummyResults = (("validation", precisionVal, recallVal, f1Val), ("test", precisionTest, recallTest, f1Test))

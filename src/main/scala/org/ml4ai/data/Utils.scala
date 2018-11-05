@@ -10,19 +10,23 @@ object Utils {
 
   def f1(preds: Map[String, Int]): Double = {
     val p = precision(preds)
+    println(p + " : precision")
     val r = recall(preds)
+    println(r + " : recall")
     if (p + r == 0) 0.0
     else ((2 * (p * r))/(p + r))
   }
 
   def precision(preds: Map[String, Int]): Double = {
-    if (preds("TP") + preds("FP") == 0) 0.0
-    else (preds("TP") / (preds("TP") + preds("FP")))
+    //println((preds("TP")))
+    //println((preds("TP") + preds("FP")))
+    if(!(preds("TP") + preds("FP") == 0)) preds("TP").toDouble / (preds("TP") + preds("FP")).toDouble
+    else 0.0
   }
 
   def recall(preds: Map[String, Int]): Double = {
-    if (preds("TP") + preds("FN") == 0) 0.0
-    else (preds("TP")/(preds("TP") + preds("FN")))
+    if (!(preds("TP") + preds("FN") == 0)) preds("TP").toDouble/(preds("TP") + preds("FN")).toDouble
+    else 0.0
   }
 
   def accuracy(preds:Map[String, Int]): Double = {
@@ -34,9 +38,9 @@ object Utils {
     val indexValuePair = yTrue.zipWithIndex
     var TP = 0; var FP = 0; var TN = 0; var FN = 0
     for((v,i) <- indexValuePair) {
-      if (v == yPred(i) == 1) TP+=1
+      if (v == yPred(i) && v == 1) TP+=1
       if (v == 1 && v!=yPred(i)) FN +=1
-      if (v == yPred(i) == 0) TN +=1
+      if (v == yPred(i) && v == 0) TN +=1
       if (v == 0 && v!=yPred(i)) FP +=1
     }
     Map(("TP" -> TP), ("FP" -> FP), ("TN" -> TN), ("FN" -> FN))
