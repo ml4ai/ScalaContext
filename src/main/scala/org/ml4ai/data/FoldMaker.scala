@@ -92,4 +92,18 @@ object FoldMaker {
     })
     dataFrame.toArray
   }
+
+  def createSentenceDistData(aggRows:Iterable[((String, String, String), AggregatedRow)]):Iterable[((String, String, String), AggregatedRow)] = {
+    val toReturn = new mutable.ListBuffer[((String, String, String), AggregatedRow)]
+    aggRows.map(x => {
+      val keys = x._1
+      val row = x._2
+      val feat = row.featureGroups.filter(_.name == "sentenceDistance")
+      val label = row.label
+      val aggRow = AggregatedRow(feat, label)
+      val entry = (keys, aggRow)
+      toReturn += entry
+    })
+    toReturn
+  }
 }

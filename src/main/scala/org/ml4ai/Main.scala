@@ -9,8 +9,9 @@ import data.AggregatedRow
 import data.FoldMaker
 import data.DummyClassifier
 import scala.collection.mutable
-import smile.validation._
 import data.GBRT
+import data.Utils
+import data.Baseline
 object Main extends App {
 
   val rows = InputRow.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/features.csv.gz")))
@@ -25,15 +26,16 @@ object Main extends App {
   val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
   val giantTruthValLabel = new mutable.ArrayBuffer[Int]()
   val giantPredValLabel = new mutable.ArrayBuffer[Int]()
-  for((train,validate,test) <- folds) {
+  for((train,_,test) <- folds) {
       val trainingData = train.collect{case x:Int => mapEntrySeq(x)}
-      val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
+      val sentDistFrame = FoldMaker.createSentenceDistData(trainingData)
+      val balancedTrainingData = Balancer.balanceByPaperAgg(sentDistFrame, 1)
       val balancedTrainingFrame = FoldMaker.createData(possibleFeatures, balancedTrainingData)
       val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData.toSeq)
       val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
 
-      val validationData = validate.collect{case x:Int => dataOnly(x)}
-      val validationFrame = FoldMaker.createData(possibleFeatures, validationData)
+      /*val validationData = validate.collect{case x:Int => dataOnly(x)}
+      val validationFrame = FoldMaker.createData(possibleFeatures, validationData)*/
 
       val testingData = test.collect{case x:Int => dataOnly(x)}
       val testingFrame = FoldMaker.createData(possibleFeatures, testingData)
@@ -41,13 +43,13 @@ object Main extends App {
 
       DummyClassifier.fit(balancedTrainingFrame, labelsToInt)
 
-      val currentTruthVal = DummyClassifier.convertOptionalToBool(validationData)
+      /*val currentTruthVal = DummyClassifier.convertOptionalToBool(validationData)
       val currentTruthInt = DummyClassifier.convertBooleansToInt(currentTruthVal)
       giantTruthValLabel ++= currentTruthInt
 
       val predValLabel = DummyClassifier.predict(validationFrame)
 
-      giantPredValLabel ++= predValLabel
+      giantPredValLabel ++= predValLabel*/
       val currentTruthTest = DummyClassifier.convertOptionalToBool(testingData)
       val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
       giantTruthTestLabel ++= currentTruthTestInt
@@ -58,20 +60,24 @@ object Main extends App {
   }
 
   // converts boolean mappings to 1's and 0's in validation set and then calculates metrics
-  println(giantTruthValLabel.size == giantPredValLabel.size)
-  val precisionVal = precision(giantTruthValLabel.toArray, giantPredValLabel.toArray)
-  val recallVal = recall(giantTruthValLabel.toArray, giantPredValLabel.toArray)
-  val f1Val = f1(giantTruthValLabel.toArray, giantPredValLabel.toArray)
+  /*println(giantTruthValLabel.size == giantPredValLabel.size)
+  val valCounts = Utils.predictCounts(giantTruthValLabel.toArray, giantPredValLabel.toArray)
+  val precisionVal = Utils.precision(valCounts)
+  val recallVal = Utils.recall(valCounts)
+  val f1Val = Utils.f1(valCounts)*/
 
   // converts boolean mappings to 1's and 0's in test set and then calculates metrics
   println(giantTruthTestLabel.size == giantPredTestLabel.size)
-  val precisionTest = precision(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
-  val recallTest = recall(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
-  val f1Test = f1(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  val testCounts = Utils.predictCounts(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  val precisionTest = Utils.precision(testCounts)
+  val recallTest = Utils.recall(testCounts)
+  val f1Test = Utils.f1(testCounts)
 
   var scoreDictionary = collection.mutable.Map[String, ((String, Double, Double, Double), (String, Double, Double, Double))]()
-  val dummyResults = (("validation", precisionVal, recallVal, f1Val), ("test", precisionTest, recallTest, f1Test))
-  scoreDictionary += ("dummy" -> dummyResults)
+  //val dummyResults = (("validation", precisionVal, recallVal, f1Val), ("test", precisionTest, recallTest, f1Test))
+  val baselineResults = (("validation", 0.0,0.0,0.0), ("test", precisionTest, recallTest, f1Test))
+  //scoreDictionary += ("dummy" -> dummyResults)
+  scoreDictionary += ("baseline" -> baselineResults)
   println(scoreDictionary.values)
 
 

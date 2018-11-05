@@ -30,7 +30,7 @@ object Utils {
     else (preds("TP") + preds("TN"))/(preds("TP") + preds("TN") + preds("FP") + preds("FN"))
   }
 
-  private def predictCounts(yTrue: Array[Int], yPred: Array[Int]): Map[String, Int] = {
+  def predictCounts(yTrue: Array[Int], yPred: Array[Int]): Map[String, Int] = {
     val indexValuePair = yTrue.zipWithIndex
     var TP = 0; var FP = 0; var TN = 0; var FN = 0
     for((v,i) <- indexValuePair) {
@@ -42,13 +42,4 @@ object Utils {
     Map(("TP" -> TP), ("FP" -> FP), ("TN" -> TN), ("FN" -> FN))
   }
 
-  def deterministicSentDist(yTrue: Array[Int], sentDistValues: Array[Double], k:Int = 3):Map[String, Double] = {
-    val tempo = sentDistValues.map(ele => {if (ele <= k) 1 else 0})
-    val countMap = predictCounts(yTrue, tempo)
-    val p =precision(countMap)
-    val recall = recall(countMap)
-    val f1 = f1(countMap)
-    val ac = accuracy(countMap)
-    Map(("precision_score" -> p), ("recall_score" -> recall), ("f1_score" -> f1), ("accuracy_score" -> ac))
-  }
 }
