@@ -10,9 +10,7 @@ object Utils {
 
   def f1(preds: Map[String, Int]): Double = {
     val p = precision(preds)
-    println(p + " : precision")
     val r = recall(preds)
-    println(r + " : recall")
     if (p + r == 0) 0.0
     else ((2 * (p * r))/(p + r))
   }

@@ -9,7 +9,6 @@ import data.AggregatedRow
 import data.FoldMaker
 import data.DummyClassifier
 import scala.collection.mutable
-import smile.validation._
 import data.GBRT
 import data.Utils
 import data.Baseline
@@ -39,10 +38,8 @@ object Main extends App {
       for(k_val <- 0 until 51) {
         val trainInstance = new Baseline(k_val)
         val pred = trainInstance.predict(balancedTrainingFrame)
-        /*val counts = Utils.predictCounts(labelsToInt, pred)
+        val counts = Utils.predictCounts(labelsToInt, pred)
         val f1score = Utils.f1(counts)
-        */
-        val f1score = f1(labelsToInt, pred)
         kToF1Map += (k_val -> f1score)
       }
 
@@ -84,9 +81,7 @@ object Main extends App {
   val precisionTest = Utils.precision(testCounts)
   val recallTest = Utils.recall(testCounts)
   val f1Test = Utils.f1(testCounts)
-  /*val precisionTest = precision(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
-  val recallTest = recall(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
-  val f1Test = f1(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)*/
+
 
   var scoreDictionary = collection.mutable.Map[String, ((String, Double, Double, Double), (String, Double, Double, Double))]()
   //val dummyResults = (("validation", precisionVal, recallVal, f1Val), ("test", precisionTest, recallTest, f1Test))
@@ -94,7 +89,5 @@ object Main extends App {
   //scoreDictionary += ("dummy" -> dummyResults)
   scoreDictionary += ("baseline" -> baselineResults)
   println(scoreDictionary.values)
-
-
 
 }
