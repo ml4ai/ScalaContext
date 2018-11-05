@@ -73,12 +73,18 @@ object FoldMaker {
   }
 
   def createData(features:Seq[String], aggRows:Iterable[AggregatedRow]):Array[Array[Double]] = {
-    val row = new mutable.HashSet[Double]
+    val row = new mutable.ListBuffer[Double]
     val dataFrame = new mutable.HashSet[Array[Double]]
     aggRows.map(x => {
       val currentAggFeatures = x.featureGroups
-      val featureNames = currentAggFeatures.map(_.name).toSet
-      val absentFeatures = features.toSet -- (featureNames ++ Seq(""))
+      val featureNames = currentAggFeatures.map(_.name)
+      val appendedFeat = new mutable.ListBuffer[String]
+      featureNames.map(x => {
+        appendedFeat += x + "_mean"
+        appendedFeat += x + "_max"
+        appendedFeat += x + "_min"
+      })
+      val absentFeatures = features.toSet -- (appendedFeat ++ Seq(""))
       currentAggFeatures.map(c => {
         row += c.mean
         row += c.min

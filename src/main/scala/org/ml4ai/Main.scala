@@ -30,19 +30,28 @@ object Main extends App {
       val trainingData = train.collect{case x:Int => mapEntrySeq(x)}
       val sentDistFrame = FoldMaker.createSentenceDistData(trainingData)
       val balancedTrainingData = Balancer.balanceByPaperAgg(sentDistFrame, 1)
-      val balancedTrainingFrame = FoldMaker.createData(possibleFeatures, balancedTrainingData)
+      val balancedTrainingFrame = FoldMaker.createData(Seq("sentenceDistance_min", "sentenceDistance_max", "sentenceDistance_mean"), balancedTrainingData)
+      //val balancedTrainingFrame = FoldMaker.createData(possibleFeatures, balancedTrainingData)
       val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData.toSeq)
       val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
 
-      /*val validationData = validate.collect{case x:Int => dataOnly(x)}
-      val validationFrame = FoldMaker.createData(possibleFeatures, validationData)*/
-
-      val testingData = test.collect{case x:Int => dataOnly(x)}
-      val testingFrame = FoldMaker.createData(possibleFeatures, testingData)
-
-
+      val testingData = test.collect{case x:Int => mapEntrySeq(x)}
+      val testSentFrame = FoldMaker.createSentenceDistData(testingData)
+      val extractCont = testSentFrame.map(x => x._2)
+      //extractCont.map(x => println(x.featureGroups))
+      //val testingFrame = FoldMaker.createData(possibleFeatures, extractCont)
+      val testingFrame = FoldMaker.createData(Seq("sentenceDistance_min", "sentenceDistance_max", "sentenceDistance_mean"), extractCont)
+      val currentTruthTest = DummyClassifier.convertOptionalToBool(extractCont.toSeq)
+      val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
+      giantTruthTestLabel ++= currentTruthTestInt
+      val predTestLabel = DummyClassifier.predict(testingFrame)
+      giantPredTestLabel ++= predTestLabel
       DummyClassifier.fit(balancedTrainingFrame, labelsToInt)
 
+
+
+    /*val validationData = validate.collect{case x:Int => dataOnly(x)}
+    val validationFrame = FoldMaker.createData(possibleFeatures, validationData)*/
       /*val currentTruthVal = DummyClassifier.convertOptionalToBool(validationData)
       val currentTruthInt = DummyClassifier.convertBooleansToInt(currentTruthVal)
       giantTruthValLabel ++= currentTruthInt
@@ -50,13 +59,7 @@ object Main extends App {
       val predValLabel = DummyClassifier.predict(validationFrame)
 
       giantPredValLabel ++= predValLabel*/
-      val currentTruthTest = DummyClassifier.convertOptionalToBool(testingData)
-      val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
-      giantTruthTestLabel ++= currentTruthTestInt
 
-      val predTestLabel = DummyClassifier.predict(testingFrame)
-
-      giantPredTestLabel ++= predTestLabel
   }
 
   // converts boolean mappings to 1's and 0's in validation set and then calculates metrics
