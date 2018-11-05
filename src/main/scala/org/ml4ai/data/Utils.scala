@@ -32,13 +32,12 @@ object Utils {
 
   def predictCounts(yTrue: Array[Int], yPred: Array[Int]): Map[String, Int] = {
     val indexValuePair = yTrue.zipWithIndex
-    println(yTrue.size == yPred.size)
     var TP = 0; var FP = 0; var TN = 0; var FN = 0
     for((v,i) <- indexValuePair) {
       if (v == yPred(i) == 1) TP+=1
-      else if (v == 1 && v!=yPred(i)) FN +=1
-      else if (v == yPred(i) == 0) TN +=1
-      else if (v == 0 && v!=yPred(i)) FP +=1
+      if (v == 1 && v!=yPred(i)) FN +=1
+      if (v == yPred(i) == 0) TN +=1
+      if (v == 0 && v!=yPred(i)) FP +=1
     }
     Map(("TP" -> TP), ("FP" -> FP), ("TN" -> TN), ("FN" -> FN))
   }

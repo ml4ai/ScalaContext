@@ -9,6 +9,7 @@ import data.AggregatedRow
 import data.FoldMaker
 import data.DummyClassifier
 import scala.collection.mutable
+import smile.validation._
 import data.GBRT
 import data.Utils
 import data.Baseline
@@ -34,7 +35,18 @@ object Main extends App {
       //val balancedTrainingFrame = FoldMaker.createData(possibleFeatures, balancedTrainingData)
       val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData.toSeq)
       val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
+      val kToF1Map = new mutable.HashMap[Int, Double]
+      for(k_val <- 0 until 51) {
+        val trainInstance = new Baseline(k_val)
+        val pred = trainInstance.predict(balancedTrainingFrame)
+        /*val counts = Utils.predictCounts(labelsToInt, pred)
+        val f1score = Utils.f1(counts)
+        */
+        val f1score = f1(labelsToInt, pred)
+        kToF1Map += (k_val -> f1score)
+      }
 
+      val bestK = Utils.argMax(kToF1Map.toMap)
       val testingData = test.collect{case x:Int => mapEntrySeq(x)}
       val testSentFrame = FoldMaker.createSentenceDistData(testingData)
       val extractCont = testSentFrame.map(x => x._2)
@@ -44,11 +56,9 @@ object Main extends App {
       val currentTruthTest = DummyClassifier.convertOptionalToBool(extractCont.toSeq)
       val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
       giantTruthTestLabel ++= currentTruthTestInt
-      val predTestLabel = DummyClassifier.predict(testingFrame)
+      val testInstance = new Baseline(bestK)
+      val predTestLabel = testInstance.predict(testingFrame)
       giantPredTestLabel ++= predTestLabel
-      DummyClassifier.fit(balancedTrainingFrame, labelsToInt)
-
-
 
     /*val validationData = validate.collect{case x:Int => dataOnly(x)}
     val validationFrame = FoldMaker.createData(possibleFeatures, validationData)*/
@@ -72,9 +82,12 @@ object Main extends App {
   // converts boolean mappings to 1's and 0's in test set and then calculates metrics
   println(giantTruthTestLabel.size == giantPredTestLabel.size)
   val testCounts = Utils.predictCounts(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
-  val precisionTest = Utils.precision(testCounts)
+  /*val precisionTest = Utils.precision(testCounts)
   val recallTest = Utils.recall(testCounts)
-  val f1Test = Utils.f1(testCounts)
+  val f1Test = Utils.f1(testCounts)*/
+  val precisionTest = precision(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  val recallTest = recall(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  val f1Test = f1(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
 
   var scoreDictionary = collection.mutable.Map[String, ((String, Double, Double, Double), (String, Double, Double, Double))]()
   //val dummyResults = (("validation", precisionVal, recallVal, f1Val), ("test", precisionTest, recallTest, f1Test))
