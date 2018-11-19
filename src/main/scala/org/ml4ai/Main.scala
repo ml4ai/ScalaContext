@@ -30,7 +30,7 @@ object Main extends App {
       val trainingData = train.collect{case x:Int => mapEntrySeq(x)}
       val sentDistFrame = FoldMaker.createSentenceDistData(trainingData)
       val balancedTrainingData = Balancer.balanceByPaperAgg(sentDistFrame, 1)
-      val balancedTrainingFrame = FoldMaker.createData(Seq("sentenceDistance_min", "sentenceDistance_max", "sentenceDistance_mean"), balancedTrainingData)
+      val balancedTrainingFrame = FoldMaker.createData(Seq("sentenceDistance_min"), balancedTrainingData)
       //val balancedTrainingFrame = FoldMaker.createData(possibleFeatures, balancedTrainingData)
       val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData.toSeq)
       val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
@@ -49,7 +49,7 @@ object Main extends App {
       val extractCont = testSentFrame.map(x => x._2)
       //extractCont.map(x => println(x.featureGroups))
       //val testingFrame = FoldMaker.createData(possibleFeatures, extractCont)
-      val testingFrame = FoldMaker.createData(Seq("sentenceDistance_min", "sentenceDistance_max", "sentenceDistance_mean"), extractCont)
+      val testingFrame = FoldMaker.createData(Seq("sentenceDistance_min"), extractCont)
       val currentTruthTest = DummyClassifier.convertOptionalToBool(extractCont.toSeq)
       val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
       giantTruthTestLabel ++= currentTruthTestInt
