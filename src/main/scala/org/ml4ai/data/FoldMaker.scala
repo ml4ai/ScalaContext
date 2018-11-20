@@ -8,7 +8,7 @@ case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRo
 }
 
 object FoldMaker {
-  def getFolds(groupedFeatures: Map[(String, String, String), AggregatedRow], valSize:Int = 4): mutable.HashSet[(Array[Int], Array[Int], Array[Int])] = {
+  def getFolds(groupedFeatures: Map[(String, String, String), AggregatedRow], valSize:Int = 4): mutable.ListBuffer[(Array[Int], Array[Int], Array[Int])] = {
 
     val degenRemoved = groupedFeatures.filter(_._1._1 != "b'PMC4204162'")
     val rowLabels = degenRemoved.map(x => x._1._1)
@@ -18,23 +18,23 @@ object FoldMaker {
 
   }
 
-  private def paperFoldLists(rowPaperLabels:Iterable[String], rows:Iterable[String], valSize: Int): mutable.HashSet[(Array[Int], Array[Int], Array[Int])] = {
-    val toReturn = new mutable.HashSet[(Array[Int], Array[Int], Array[Int])]
-    val testingSets = collection.mutable.Map[String, collection.mutable.HashSet[Int]]()
-    rowPaperLabels.foreach({x => testingSets += (x -> new collection.mutable.HashSet[Int])})
+  private def paperFoldLists(rowPaperLabels:Iterable[String], rows:Iterable[String], valSize: Int): mutable.ListBuffer[(Array[Int], Array[Int], Array[Int])] = {
+    val toReturn = new mutable.ListBuffer[(Array[Int], Array[Int], Array[Int])]
+    val testingSets = collection.mutable.Map[String, collection.mutable.ListBuffer[Int]]()
+    rowPaperLabels.foreach({x => testingSets += (x -> new collection.mutable.ListBuffer[Int])})
     rows.zipWithIndex.foreach {
       case(ele, index) => testingSets(ele) += index
     }
 
     rowPaperLabels.foreach {
-      case currentId => {
+      currentId => {
         val testingSet = testingSets(currentId)
-        val otherIDs = rowPaperLabels.toSet -- Seq(currentId)
+        val otherIDs = (rowPaperLabels.toSet -- Seq(currentId)).toList
         val shuffled = scala.util.Random.shuffle(otherIDs)
         val validationIds = shuffled.take(valSize)
         val trainingIds = shuffled.drop(valSize)
-        val validationSet = new mutable.HashSet[Int]()
-        val trainingSet = new mutable.HashSet[Int]()
+        val validationSet = new mutable.ListBuffer[Int]()
+        val trainingSet = new mutable.ListBuffer[Int]()
         rows.zipWithIndex.foreach {
           case (paperID, subIndex) => {
             if (validationIds.contains(paperID))
