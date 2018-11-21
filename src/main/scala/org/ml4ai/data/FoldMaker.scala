@@ -1,7 +1,5 @@
 package org.ml4ai.data
 import scala.collection.mutable
-
-
 case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRow]) extends Iterable[(Array[Int], Array[Int], Array[Int])]{
   def toFolds:Iterable[(Array[Int], Array[Int], Array[Int])] = new mutable.HashSet[(Array[Int], Array[Int], Array[Int])]()
   override def iterator:Iterator[(Array[Int], Array[Int], Array[Int])] = this.toFolds.iterator
@@ -112,4 +110,5 @@ object FoldMaker {
     })
     toReturn
   }
+
 }

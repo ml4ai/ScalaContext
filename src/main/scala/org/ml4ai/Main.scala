@@ -1,6 +1,6 @@
 package org.ml4ai
 
-import java.util.zip.GZIPInputStream
+import java.util.zip._
 
 
 import data.InputRow
@@ -11,12 +11,39 @@ import data.DummyClassifier
 import scala.collection.mutable
 import data.Utils
 import data.Baseline
+import scala.io.Source
 object Main extends App {
 
   val rows = InputRow.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/features.csv.gz")))
   val balancedRows = Balancer.balanceByPaper(rows, 1)
   val possibleFeatures = FoldMaker.getPossibleNumericFeatures(balancedRows)
+  println("number of rows before aggregation : " + balancedRows.size)
   val aggregatedRows = AggregatedRow.fromRows(balancedRows)
+  val bufferedFoldIndices = Source.fromFile("./src/main/resources/cv_folds_val_4.csv")
+  val listOfIndices = collection.mutable.ListBuffer[(Array[Int], Array[Int], Array[Int])]()
+  for(line <- bufferedFoldIndices.getLines()) {
+    val cols = line.split("]").map(_.trim)
+    val trainSet = collection.mutable.ListBuffer[Int]()
+    val validationSet = collection.mutable.ListBuffer[Int]()
+    val testSet = collection.mutable.ListBuffer[Int]()
+    val subCols = cols.take(3)
+    subCols.zipWithIndex.foreach{
+      case (s,i) => {
+        val temp = s.replace("[","")
+        val stringVals = temp.split(",")
+
+      }
+    }
+
+    /*crossVal.map((s,i) => {
+      val stringValuesTemp = s.replace("[","")
+      val stringVals = stringValuesTemp.split(",")
+
+    })*/
+
+
+  }
+  println("number of rows after aggregation : " + aggregatedRows.size)
   val folds = FoldMaker.getFolds(aggregatedRows)
   val retainKeys = aggregatedRows mapValues(x => x)
   val mapEntrySeq = retainKeys.toSeq
