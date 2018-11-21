@@ -29,19 +29,21 @@ object Main extends App {
     val subCols = cols.take(3)
     subCols.zipWithIndex.foreach{
       case (s,i) => {
-        val temp = s.replace("[","")
+        val temp = s.trim.replace("[", "")
         val stringVals = temp.split(",")
-
+        val intVals = stringVals.map(x => {
+          Integer.parseInt(x.trim)})
+        if(i == 0)
+          trainSet ++= intVals
+        else if(i == 1)
+          validationSet ++= intVals
+        else
+          testSet ++= intVals
       }
     }
-
-    /*crossVal.map((s,i) => {
-      val stringValuesTemp = s.replace("[","")
-      val stringVals = stringValuesTemp.split(",")
-
-    })*/
-
-
+    testSet.toArray.map(x => print(x + " "))
+    val toAdd = (trainSet.toArray, validationSet.toArray, testSet.toArray)
+    listOfIndices += toAdd
   }
   println("number of rows after aggregation : " + aggregatedRows.size)
   val folds = FoldMaker.getFolds(aggregatedRows)
