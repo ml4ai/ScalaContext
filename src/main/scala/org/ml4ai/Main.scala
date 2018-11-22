@@ -21,30 +21,7 @@ object Main extends App {
   val aggregatedRows = AggregatedRow.fromRows(balancedRows)
   val bufferedFoldIndices = Source.fromFile("./src/main/resources/cv_folds_val_4.csv")
   val listOfIndices = collection.mutable.ListBuffer[(Array[Int], Array[Int], Array[Int])]()
-  for(line <- bufferedFoldIndices.getLines()) {
-    val cols = line.split("]").map(_.trim)
-    val trainSet = collection.mutable.ListBuffer[Int]()
-    val validationSet = collection.mutable.ListBuffer[Int]()
-    val testSet = collection.mutable.ListBuffer[Int]()
-    val subCols = cols.take(3)
-    subCols.zipWithIndex.foreach{
-      case (s,i) => {
-        val temp = s.trim.replace("[", "")
-        val stringVals = temp.split(",")
-        val intVals = stringVals.map(x => {
-          Integer.parseInt(x.trim)})
-        if(i == 0)
-          trainSet ++= intVals
-        else if(i == 1)
-          validationSet ++= intVals
-        else
-          testSet ++= intVals
-      }
-    }
-    testSet.toArray.map(x => print(x + " "))
-    val toAdd = (trainSet.toArray, validationSet.toArray, testSet.toArray)
-    listOfIndices += toAdd
-  }
+  val foldsFromCSV = FoldMaker.getFoldsPerPaper(bufferedFoldIndices)
   println("number of rows after aggregation : " + aggregatedRows.size)
   val folds = FoldMaker.getFolds(aggregatedRows)
   val retainKeys = aggregatedRows mapValues(x => x)

@@ -1,5 +1,8 @@
 package org.ml4ai.data
 import scala.collection.mutable
+import java.io.InputStream
+
+import scala.io.{BufferedSource, Source}
 case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRow]) extends Iterable[(Array[Int], Array[Int], Array[Int])]{
   def toFolds:Iterable[(Array[Int], Array[Int], Array[Int])] = new mutable.HashSet[(Array[Int], Array[Int], Array[Int])]()
   override def iterator:Iterator[(Array[Int], Array[Int], Array[Int])] = this.toFolds.iterator
@@ -109,6 +112,20 @@ object FoldMaker {
       toReturn += entry
     })
     toReturn
+  }
+
+  // The number of line sin the file are the number of cross-val leave one out sets, i.e. the number of papers.
+  // Each line has the following composition: (training_set, validation_set, testing_set)
+  // the whole line is searched for the first occurrence of "[" and "]" i.e. the training set
+  // we truncate the whole line by dropping the training set, and continue this for validation and testing sets.
+  def getFoldsPerPaper(bufSource:BufferedSource):Array[(Array[Int], Array[Int], Array[Int])] = {
+    val perPaperLines = bufSource.getLines()
+
+    perPaperLines.foreach(p => {
+      val sets = p.split("\\]\",\"\\[")
+      println(sets.size)
+    })
+    Array((Array(0), Array(0), Array(0)))
   }
 
 }
