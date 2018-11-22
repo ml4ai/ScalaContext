@@ -123,7 +123,8 @@ object FoldMaker {
 
     perPaperLines.foreach(p => {
       val sets = p.split("\\]\",\"\\[")
-      println(sets.size)
+      val cleanStrSets = sets.map(s => s.replace("\"[",""))
+      println(cleanStrSets.size)
     })
     Array((Array(0), Array(0), Array(0)))
   }
