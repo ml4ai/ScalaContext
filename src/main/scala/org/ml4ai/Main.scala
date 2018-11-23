@@ -20,10 +20,8 @@ object Main extends App {
   println("number of rows before aggregation : " + balancedRows.size)
   val aggregatedRows = AggregatedRow.fromRows(balancedRows)
   val bufferedFoldIndices = Source.fromFile("./src/main/resources/cv_folds_val_4.csv")
-  val listOfIndices = collection.mutable.ListBuffer[(Array[Int], Array[Int], Array[Int])]()
   val foldsFromCSV = FoldMaker.getFoldsPerPaper(bufferedFoldIndices)
   println("number of rows after aggregation : " + aggregatedRows.size)
-  val folds = FoldMaker.getFolds(aggregatedRows)
   val retainKeys = aggregatedRows mapValues(x => x)
   val mapEntrySeq = retainKeys.toSeq
   val dataOnly = mapEntrySeq.map(x => x._2)
@@ -31,7 +29,7 @@ object Main extends App {
   val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
   val giantTruthValLabel = new mutable.ArrayBuffer[Int]()
   val giantPredValLabel = new mutable.ArrayBuffer[Int]()
-  for((train,_,test) <- folds) {
+  for((train,_,test) <- foldsFromCSV) {
       val trainingData = train.collect{case x:Int => mapEntrySeq(x)}
       val sentDistFrame = FoldMaker.createSentenceDistData(trainingData)
       val balancedTrainingData = Balancer.balanceByPaperAgg(sentDistFrame, 1)

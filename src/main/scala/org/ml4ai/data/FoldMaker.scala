@@ -9,48 +9,6 @@ case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRo
 }
 
 object FoldMaker {
-  def getFolds(groupedFeatures: Map[(String, String, String), AggregatedRow], valSize:Int = 4): mutable.ListBuffer[(Array[Int], Array[Int], Array[Int])] = {
-
-    val degenRemoved = groupedFeatures.filter(_._1._1 != "b'PMC4204162'")
-    val rowLabels = degenRemoved.map(x => x._1._1)
-    val paperLabels = rowLabels.toSet
-    val toReturn = paperFoldLists(paperLabels, rowLabels, valSize)
-    toReturn
-
-  }
-
-  private def paperFoldLists(rowPaperLabels:Iterable[String], rows:Iterable[String], valSize: Int): mutable.ListBuffer[(Array[Int], Array[Int], Array[Int])] = {
-    val toReturn = new mutable.ListBuffer[(Array[Int], Array[Int], Array[Int])]
-    val testingSets = collection.mutable.Map[String, collection.mutable.ListBuffer[Int]]()
-    rowPaperLabels.foreach({x => testingSets += (x -> new collection.mutable.ListBuffer[Int])})
-    rows.zipWithIndex.foreach {
-      case(ele, index) => testingSets(ele) += index
-    }
-
-    rowPaperLabels.foreach {
-      currentId => {
-        val testingSet = testingSets(currentId)
-        val otherIDs = (rowPaperLabels.toSet -- Seq(currentId)).toList
-        val shuffled = scala.util.Random.shuffle(otherIDs)
-        val validationIds = shuffled.take(valSize)
-        val trainingIds = shuffled.drop(valSize)
-        val validationSet = new mutable.ListBuffer[Int]()
-        val trainingSet = new mutable.ListBuffer[Int]()
-        rows.zipWithIndex.foreach {
-          case (paperID, subIndex) => {
-            if (validationIds.contains(paperID))
-              validationSet += subIndex
-            else if (trainingIds.contains(paperID))
-              trainingSet += subIndex
-          }
-        }
-        val tup = (trainingSet.toArray, validationSet.toArray, testingSet.toArray)
-        toReturn += tup
-
-      }
-    }
-    toReturn
-  }
 
   def getPossibleNumericFeatures(rows:Iterable[InputRow]): Seq[String] = {
     val tempo = mutable.HashSet("closesCtxOfClass", "context_frequency",
@@ -114,19 +72,29 @@ object FoldMaker {
     toReturn
   }
 
-  // The number of line sin the file are the number of cross-val leave one out sets, i.e. the number of papers.
-  // Each line has the following composition: (training_set, validation_set, testing_set)
-  // the whole line is searched for the first occurrence of "[" and "]" i.e. the training set
-  // we truncate the whole line by dropping the training set, and continue this for validation and testing sets.
   def getFoldsPerPaper(bufSource:BufferedSource):Array[(Array[Int], Array[Int], Array[Int])] = {
     val perPaperLines = bufSource.getLines()
-
+    val toReturn = collection.mutable.ListBuffer[(Array[Int], Array[Int], Array[Int])]()
     perPaperLines.foreach(p => {
       val sets = p.split("\\]\",\"\\[")
       val cleanStrSets = sets.map(s => s.replace("\"[",""))
-      println(cleanStrSets.size)
+      val clean2 = cleanStrSets.map(c => c.replace("]\"",""))
+      val trainStr = clean2(0)
+      val validationStr = clean2(1)
+      val testStr = clean2(2)
+      val trainIndex = splitAndExtract(trainStr)
+      val valIndex = splitAndExtract(validationStr)
+      val testIndex = splitAndExtract(testStr)
+      val tup = (trainIndex, valIndex, testIndex)
+      toReturn += tup
     })
-    Array((Array(0), Array(0), Array(0)))
+
+    def splitAndExtract(arr: String):Array[Int] = {
+      val strArr = arr.split(", ")
+      val intVals = strArr.map(s => Integer.parseInt(s))
+      intVals
+    }
+    toReturn.toArray
   }
 
 }
