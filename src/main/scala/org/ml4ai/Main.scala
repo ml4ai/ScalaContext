@@ -11,7 +11,8 @@ import data.Utils
 import data.Baseline
 import scala.io.Source
 object Main extends App {
-  val (allFeatures,rows2) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
+  val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
+  val rows2 = rows.filter(_.PMCID != "b'PMC4204162'")
   val bufferedFoldIndices = Source.fromFile("./src/main/resources/cv_folds_val_4.csv")
   // in the specific set of features, sentenceDist_min is always at index 18 for all thr aggregated rows
   val sentDistMinIndex = 18
