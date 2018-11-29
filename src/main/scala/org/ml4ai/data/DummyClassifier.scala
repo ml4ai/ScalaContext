@@ -12,7 +12,7 @@ object DummyClassifier extends ClassifierMask {
     toReturn.toArray
   }
 
-  def convertOptionalToBool(rows: Seq[AggregatedRow]): Seq[Boolean] = {
+  def convertOptionalToBool(rows: Seq[AggregatedRowNew]): Seq[Boolean] = {
     rows.map(x => x.label match {
       case Some(x) => x
       case _ => false

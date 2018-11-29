@@ -1,6 +1,6 @@
 package org.ml4ai.data
 import scala.collection.mutable
-import java.io.InputStream
+
 
 import scala.io.{BufferedSource, Source}
 case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRow]) extends Iterable[(Array[Int], Array[Int], Array[Int])]{
@@ -9,27 +9,6 @@ case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRo
 }
 
 object FoldMaker {
-
-  def getPossibleNumericFeatures(rows:Iterable[InputRow]): Seq[String] = {
-    val tempo = mutable.HashSet("closesCtxOfClass", "context_frequency",
-      "evtNegationInTail", "evtSentenceFirstPerson", "evtSentencePastTense", "evtSentencePresentTense", "sentenceDistance", "dependencyDistance")
-    val construct = new mutable.HashSet[String]
-    rows.foreach(x => {
-      x.evt_dependencyTails.foreach(y => construct += y)
-      x.ctx_dependencyTails.foreach(z => construct += z)
-    })
-    tempo.map{x => construct += x}
-    val toReturn = new mutable.HashSet[String]
-    construct.map{ x => {
-      val min = x + "_min"
-      toReturn += min
-      val max = x+"_max"
-      toReturn += max
-      val mean = x + "_mean"
-      toReturn += mean
-    }}
-    toReturn.toSeq
-  }
 
   def createData(features:Seq[String], aggRows:Iterable[AggregatedRow]):Array[Array[Double]] = {
     val row = new mutable.ListBuffer[Double]
@@ -70,6 +49,15 @@ object FoldMaker {
       toReturn += entry
     })
     toReturn
+  }
+
+  def extractData(rows: Seq[AggregatedRowNew], sentMinIndex: Int): Array[Array[Double]] = {
+    val returnValue = new mutable.ListBuffer[Array[Double]]()
+    rows.map(r => {
+      val temp = r.featureGroups(sentMinIndex)
+      val array = Array(temp)
+    returnValue += array })
+    returnValue.toArray
   }
 
   def getFoldsPerPaper(bufSource:BufferedSource):Array[(Array[Int], Array[Int], Array[Int])] = {
