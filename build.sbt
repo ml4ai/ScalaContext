@@ -14,4 +14,7 @@ lazy val root = (project in file(".")).
     )
   )
 
-libraryDependencies += "com.github.haifengl" %% "smile-scala" % "1.5.1"
+libraryDependencies ++= Seq(
+  "com.github.haifengl" %% "smile-scala" % "1.5.1",
+  "org.clulab" %% "processors-main" % "7.4.2",
+)
