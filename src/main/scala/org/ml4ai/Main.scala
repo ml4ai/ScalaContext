@@ -2,8 +2,10 @@ package org.ml4ai
 
 import java.util.zip._
 
+import org.clulab.learning.{LibSVMClassifier, LinearKernel}
+
 import scala.collection.mutable
-import org.ml4ai.data.classifiers.{Baseline, DummyClassifier}
+import org.ml4ai.data.classifiers.{Baseline, DummyClassifier, SVM}
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Balancer, FoldMaker, Utils}
 
 import scala.io.Source
@@ -37,6 +39,8 @@ object Main extends App {
       val bestK = Utils.argMax(kToF1Map.toMap)
       val testingData = test.collect{case x:Int => rows2(x)}
       val testSentFrame = FoldMaker.extractData(testingData, sentDistMinIndex)
+      // creating an instance of Linear SVM classifier
+      val classifier = new LibSVMClassifier[String, String](LinearKernel)
       val currentTruthTest = DummyClassifier.convertOptionalToBool(testingData)
       val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
       giantTruthTestLabel ++= currentTruthTestInt
