@@ -1,4 +1,4 @@
-package org.ml4ai.data
+package org.ml4ai.data.utils.correctDataPrep
 
 object Utils {
   def argMax(values:Map[Int, Double]):Int = {

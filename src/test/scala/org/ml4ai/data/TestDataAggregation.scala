@@ -1,5 +1,8 @@
 package org.ml4ai.data
 
+import org.ml4ai.data.utils.correctDataPrep.Balancer
+import org.ml4ai.data.utils.oldDataPrep.AggregatedRow
+import org.ml4ai.data.utils.oldDataPrep.InputRow
 import org.scalatest.{FlatSpec, Matchers}
 
 class TestDataAggregation extends FlatSpec with Matchers{

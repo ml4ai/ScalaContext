@@ -1,4 +1,4 @@
-package org.ml4ai.data
+package org.ml4ai.data.classifiers
 
 case class Baseline(k:Int) extends ClassifierMask {
   override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]): Unit = {}
@@ -13,4 +13,3 @@ case class Baseline(k:Int) extends ClassifierMask {
     res
   }
 }
-

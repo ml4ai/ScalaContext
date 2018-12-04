@@ -1,4 +1,5 @@
-package org.ml4ai.data
+package org.ml4ai.data.utils.oldDataPrep
+
 import scala.collection.mutable
 case class AggregatedRow(featureGroups:Iterable[AggregatedFeature], label:Option[Boolean]) extends Iterable[(String, Double)]{
   def toFeatures: Iterable[(String, Double)] = featureGroups.flatten

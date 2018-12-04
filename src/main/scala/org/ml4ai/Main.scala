@@ -2,13 +2,10 @@ package org.ml4ai
 
 import java.util.zip._
 
-import data.Balancer
-import data.AggregatedRowNew
-import data.FoldMaker
-import data.DummyClassifier
 import scala.collection.mutable
-import data.Utils
-import data.Baseline
+import org.ml4ai.data.classifiers.{Baseline, DummyClassifier}
+import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Balancer, FoldMaker, Utils}
+
 import scala.io.Source
 object Main extends App {
   val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))

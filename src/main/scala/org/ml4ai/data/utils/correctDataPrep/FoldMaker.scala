@@ -1,9 +1,8 @@
-package org.ml4ai.data
+package org.ml4ai.data.utils.correctDataPrep
+
 import scala.collection.mutable
-
-
-import scala.io.{BufferedSource, Source}
-case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRow]) extends Iterable[(Array[Int], Array[Int], Array[Int])]{
+import scala.io.BufferedSource
+case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRowNew]) extends Iterable[(Array[Int], Array[Int], Array[Int])]{
   def toFolds:Iterable[(Array[Int], Array[Int], Array[Int])] = new mutable.HashSet[(Array[Int], Array[Int], Array[Int])]()
   override def iterator:Iterator[(Array[Int], Array[Int], Array[Int])] = this.toFolds.iterator
 }

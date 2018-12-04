@@ -1,4 +1,7 @@
-package org.ml4ai.data
+package org.ml4ai.data.classifiers
+
+import org.ml4ai.data.utils.correctDataPrep.AggregatedRowNew
+
 object DummyClassifier extends ClassifierMask {
   override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]) :Unit = ()
 

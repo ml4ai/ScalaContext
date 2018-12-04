@@ -1,4 +1,6 @@
-package org.ml4ai.data
+package org.ml4ai.data.utils.correctDataPrep
+
+import org.ml4ai.data.utils.oldDataPrep.InputRow
 
 object Balancer {
   /**
@@ -111,4 +113,3 @@ object Balancer {
     all_rows
   }
 }
-
