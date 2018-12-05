@@ -7,14 +7,20 @@ case class SVM(classifier: LibSVMClassifier[Int, Double]) extends ClassifierMask
   override def predict(xTest:Array[Array[Double]]): Array[Int] = List.fill(xTest.size)(1).toArray
 
 
-  private def mkRVFDatum[L](label:L, features:Array[Double]):RVFDatum[L, Double] = {
-    val c = new Counter[Double]
-    for(f <- features) c.incrementCount(f)
-    new RVFDatum[L, Double](label, c)
+  // Consider features as pairs of (feature name, feature value)
+  private def mkRVFDatum[L](label:L, features:Array[(String, Double)]):RVFDatum[L, String] = {
+    // In here, Counter[T] basically works as a dictionary, and String should be the simplest way to implement it
+    // when you call c.incrementCount, you basically assign the feature called "featureName", the value in the second parameter ("inc")
+    val c = new Counter[String]
+    // In this loop we go through all the elements in features and initialize the counter with the values. It's weird but that's the way it was written
+    for((featureName, featureValue) <- features) c.incrementCount(featureName, inc = featureValue)
+    // Just changed the second type argument to string here. Label is the class, so, L can be Int to reflext 1 or 0
+    new RVFDatum[L, String](label, c)
   }
 
-  def mkRVFDataSet(labels: Array[Int], dataSet:Array[Array[Double]]):RVFDataset[Int, Double] = {
-    val dataSetToReturn = new RVFDataset[Int, Double]()
+  // Here I made the changes to reflect my comments above. 
+  def mkRVFDataSet(labels: Array[Int], dataSet:Array[Array[(String, Double)]]):RVFDataset[Int, String] = {
+    val dataSetToReturn = new RVFDataset[Int, String]()
     val tupIter = dataSet zip labels
     for((d,l) <- tupIter) {
       val currentDatum = mkRVFDatum(l,d)
