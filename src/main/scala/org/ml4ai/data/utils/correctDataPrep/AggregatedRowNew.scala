@@ -11,7 +11,8 @@ case class AggregatedRowNew(
                              EvtID: String,
                              CtxID: String,
                              label: Option[Boolean],
-                             featureGroups: Array[Double])
+                             featureGroups: Array[Double],
+                             featureGroupNames:Array[String])
 
 object AggregatedRowNew {
   private val listOfSpecificFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "closesCtxOfClass_min", "closesCtxOfClass_max", "closesCtxOfClass_avg", "context_frequency_min","context_frequency_max", "context_frequency_avg",
@@ -24,14 +25,21 @@ object AggregatedRowNew {
     val sentencePos = rowData(0).toInt
     var evt_dependencyTails = new mutable.ListBuffer[Double]
     var ctx_dependencyTails = new mutable.ListBuffer[Double]
+    var evt_dependencyFeatures = new mutable.ListBuffer[String]
+    var ctx_dependencyFeatures = new mutable.ListBuffer[String]
     val featureGroups = new mutable.ListBuffer[Double]
+    val featureNames = new mutable.ListBuffer[String]
     allOtherFeatures foreach {
       case evt:String if evt.startsWith("evtDepTail") =>
         if(rowData(indices(evt)) != "0.0")
-          evt_dependencyTails += (rowData(indices(evt))).toDouble
+          {evt_dependencyTails += (rowData(indices(evt))).toDouble
+            evt_dependencyFeatures += evt
+          }
       case ctx:String if ctx.startsWith("ctxDepTail") =>
-        if(rowData(indices(ctx)) != "0.0")
+        if(rowData(indices(ctx)) != "0.0") {
           ctx_dependencyTails += (rowData(indices(ctx))).toDouble
+          ctx_dependencyFeatures += ctx
+        }
       case _ => 0.0
     }
 
@@ -44,6 +52,7 @@ object AggregatedRowNew {
     val label = rowData(indices("label"))
 
     val listOfNumericFeatures = listOfSpecificFeatures.drop(4)
+    featureNames ++= listOfNumericFeatures
     listOfNumericFeatures.map(l => {
       val tempVal = rowData(indices(l))
       featureGroups += tempVal.toDouble
@@ -51,7 +60,9 @@ object AggregatedRowNew {
 
     featureGroups ++= evt_dependencyTails
     featureGroups ++= ctx_dependencyTails
-    AggregatedRowNew(sentencePos, pmcid, evt, ctx, Some(label.toBoolean), featureGroups.toArray)
+    featureNames ++= evt_dependencyFeatures
+    featureNames ++= ctx_dependencyFeatures
+    AggregatedRowNew(sentencePos, pmcid, evt, ctx, Some(label.toBoolean), featureGroups.toArray, featureNames.toArray)
   }
 
   def fromStream(stream:InputStream):(Seq[String], Seq[AggregatedRowNew]) = {
