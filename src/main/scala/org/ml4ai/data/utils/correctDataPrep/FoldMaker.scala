@@ -1,5 +1,7 @@
 package org.ml4ai.data.utils.correctDataPrep
 
+import org.ml4ai.data.classifiers.{Baseline, DummyClassifier}
+
 import scala.collection.mutable
 import scala.io.BufferedSource
 case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRowNew]) extends Iterable[(Array[Int], Array[Int], Array[Int])]{
@@ -38,6 +40,44 @@ object FoldMaker {
       intVals
     }
     toReturn.toArray
+  }
+
+  def baselineController(foldsFromCSV: Array[(Array[Int], Array[Int], Array[Int])], rows2: Seq[AggregatedRowNew]): Map[String, ((String, Double, Double, Double), (String, Double, Double, Double))] = {
+    val sentDistMinIndex = 18
+    val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
+    val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
+    for((train,_,test) <- foldsFromCSV) {
+      val trainingData = train.collect{case x:Int => rows2(x)}
+      val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
+
+      val sentDistTrainFrame = FoldMaker.extractData(balancedTrainingData, sentDistMinIndex)
+      val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
+      val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
+      val kToF1Map = new mutable.HashMap[Int, Double]
+      for(k_val <- 0 until 51) {
+        val trainInstance = new Baseline(k_val)
+        val pred = trainInstance.predict(sentDistTrainFrame)
+        val counts = Utils.predictCounts(labelsToInt, pred)
+        val f1score = Utils.f1(counts)
+        kToF1Map += (k_val -> f1score)
+      }
+      val bestK = Utils.argMax(kToF1Map.toMap)
+      val testingData = test.collect{case x:Int => rows2(x)}
+      val testSentFrame = FoldMaker.extractData(testingData, sentDistMinIndex)
+      val currentTruthTest = DummyClassifier.convertOptionalToBool(testingData)
+      val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
+      giantTruthTestLabel ++= currentTruthTestInt
+      val testInstance = new Baseline(bestK)
+      val predTestLabel = testInstance.predict(testSentFrame)
+      giantPredTestLabel ++= predTestLabel
+
+    }
+
+    val testCounts = Utils.predictCounts(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+    val precisionTest = Utils.precision(testCounts)
+    val recallTest = Utils.recall(testCounts)
+    val f1Test = Utils.f1(testCounts)
+    Map("baseline" -> (("validation", 0.0,0.0,0.0), ("test", precisionTest, recallTest, f1Test)))
   }
 
 }
