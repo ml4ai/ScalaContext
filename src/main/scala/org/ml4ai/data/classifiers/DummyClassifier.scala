@@ -6,6 +6,10 @@ object DummyClassifier extends ClassifierMask {
   override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]) :Unit = ()
 
   override def predict(xTest:Array[Array[Double]]): Array[Int] = List.fill(xTest.size)(1).toArray
+
+  override def scoreMaker(name: String, truth: Array[Int], predicted: Array[Int], truthTest:Array[Int], predTest:Array[Int]): Map[String, ((String, Double, Double, Double), (String, Double, Double, Double))] = {
+    Map("dummy" -> (("validation", 0.0, 0.0,0.0), ("test", 0.0,0.0,0.0)))
+  }
   def convertBooleansToInt(labels: Seq[Boolean]):Array[Int] = {
 
     val toReturn = labels.map(l => l match {
