@@ -22,6 +22,20 @@ object Main extends App {
   println(scoreDictionary)
 
   // SVM classifier
-  val SVMClassifier = new LibSVMClassifier[String, String](LinearKernel)
+  val SVMClassifier = new LibSVMClassifier[Int, Double](LinearKernel)
+  val svmInstance = new SVM(SVMClassifier)
+  val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
+  val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
+  for((train,validate,test) <- foldsFromCSV) {
+    val trainingData = train.collect{case x:Int => rows2(x)}
+    val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
+
+    val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
+    val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
+    giantTruthTestLabel++=labelsToInt
+
+    val tups = svmInstance.constructTupsForRVF(balancedTrainingData)
+    val trainDataSet = svmInstance.mkRVFDataSet(labelsToInt,tups)
+  }
 
 }

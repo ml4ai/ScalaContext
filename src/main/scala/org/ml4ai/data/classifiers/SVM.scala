@@ -1,6 +1,7 @@
 package org.ml4ai.data.classifiers
 import org.clulab.learning.{LibSVMClassifier, LinearKernel, PolynomialKernel, RBFKernel, RVFDataset, RVFDatum}
 import org.clulab.struct.Counter
+import org.ml4ai.data.utils.correctDataPrep.AggregatedRowNew
 case class SVM(classifier: LibSVMClassifier[Int, Double]) extends ClassifierMask {
   override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]) :Unit = ()
 
@@ -27,6 +28,17 @@ case class SVM(classifier: LibSVMClassifier[Int, Double]) extends ClassifierMask
       dataSetToReturn += currentDatum
     }
     dataSetToReturn
+  }
+
+  def constructTupsForRVF(rows: Seq[AggregatedRowNew]):Array[Array[(String, Double)]] = {
+    val toReturn = collection.mutable.ListBuffer[Array[(String,Double)]]()
+    rows.map(r => {
+      val featureVals = r.featureGroups
+      val featureName = r.featureGroupNames
+      val zipped = featureName zip featureVals
+      toReturn += zipped
+    })
+    toReturn.toArray
   }
 
 
