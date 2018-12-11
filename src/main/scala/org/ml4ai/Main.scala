@@ -60,7 +60,12 @@ object Main extends App {
     val testLabelsPred = testDatumCollect.map(td => svmInstance.predict(td))
     giantPredTestLabel ++= testLabelsPred
   }
+  /*println("giantPredTestLabel size: " + giantPredTestLabel.size)
+  println("giantTruthTestLabel: " + giantTruthTestLabel.size)
+  println("giantPredValLabel: " + giantPredValLabel.size)
+  println("giantTruthValLabel: " + giantTruthValLabel.size)*/
   val svmScore = svmInstance.scoreMaker("Linear SVM", giantTruthValLabel.toArray, giantPredValLabel.toArray, giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
   scoreDictionary ++= svmScore
+  println("size of score dictionary: " + scoreDictionary.size)
   println(scoreDictionary)
 }
