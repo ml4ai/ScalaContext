@@ -28,7 +28,7 @@ object Main extends App {
   val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
   val giantTruthValLabel = new mutable.ArrayBuffer[Int]()
   val giantPredValLabel = new mutable.ArrayBuffer[Int]()
-  for((train,validate,test) <- foldsFromCSV) {
+  for((train,_,test) <- foldsFromCSV) {
     val trainingData = train.collect{case x:Int => rows2(x)}
     val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
 
@@ -41,16 +41,6 @@ object Main extends App {
     svmInstance.fit(trainDataSet)
 
 
-    val validationData = validate.collect{case v:Int => rows2(v)}
-    val validationLabels = DummyClassifier.convertOptionalToBool(validationData)
-    val valLabelsTruth = DummyClassifier.convertBooleansToInt(validationLabels)
-    giantTruthValLabel ++= valLabelsTruth
-    val tupsVal = svmInstance.constructTupsForRVF(validationData)
-    val (_, valDatumCollect) = svmInstance.mkRVFDataSet(valLabelsTruth, tupsVal)
-    val valLabelsPred = valDatumCollect.map(vd => svmInstance.predict(vd))
-    giantPredValLabel ++= valLabelsPred
-
-
     val testingData = test.collect{case t: Int => rows2(t)}
     val testLabels = DummyClassifier.convertOptionalToBool(testingData)
     val testLabelsTruth = DummyClassifier.convertBooleansToInt(testLabels)
@@ -60,10 +50,7 @@ object Main extends App {
     val testLabelsPred = testDatumCollect.map(td => svmInstance.predict(td))
     giantPredTestLabel ++= testLabelsPred
   }
-  /*println("giantPredTestLabel size: " + giantPredTestLabel.size)
-  println("giantTruthTestLabel: " + giantTruthTestLabel.size)
-  println("giantPredValLabel: " + giantPredValLabel.size)
-  println("giantTruthValLabel: " + giantTruthValLabel.size)*/
+
   val svmScore = svmInstance.scoreMaker("Linear SVM", giantTruthValLabel.toArray, giantPredValLabel.toArray, giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
   scoreDictionary ++= svmScore
   println("size of score dictionary: " + scoreDictionary.size)
