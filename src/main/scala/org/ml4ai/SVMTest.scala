@@ -12,7 +12,8 @@ object SVMTest extends App{
   }
 
 
-  val classifier = new LibSVMClassifier[String, String](LinearKernel)
+  val classifier = new LibSVMClassifier[String, String](LinearKernel, C = 1, cacheSize = 100)
+
 
   val dataset = new RVFDataset[String, String]()
 

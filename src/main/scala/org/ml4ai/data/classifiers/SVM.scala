@@ -26,7 +26,6 @@ case class SVM(classifier: LibSVMClassifier[Int, String]) extends ClassifierMask
     val f1Test = Utils.f1(countsTest)
     val testTup = ("test", precTest, recallTest, f1Test)
     val mapToReturn = Map(name -> (valTup, testTup))
-    println(mapToReturn)
     mapToReturn
   }
 

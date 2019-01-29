@@ -5,9 +5,9 @@ import java.util.zip._
 import org.clulab.learning.{LibSVMClassifier, LinearKernel}
 
 import scala.collection.mutable
-import org.ml4ai.data.classifiers.{Baseline, DummyClassifier, SVM}
+import org.ml4ai.data.classifiers.{DummyClassifier, SVM}
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Balancer, FoldMaker, Utils}
-
+//next steps: try LibLinear classifier, and make sure RVFDataSet allots accurate values to its features
 import scala.io.Source
 object Main extends App {
   val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
@@ -22,7 +22,7 @@ object Main extends App {
 
 
   // SVM classifier
-  val SVMClassifier = new LibSVMClassifier[Int, String](LinearKernel)
+  val SVMClassifier = new LibSVMClassifier[Int, String](LinearKernel, C= 0.001, eps = 0.001)
   val svmInstance = new SVM(SVMClassifier)
   val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
   val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
