@@ -1,6 +1,6 @@
 package org.ml4ai
 
-import org.clulab.learning.{LibSVMClassifier, LinearKernel, RVFDataset, RVFDatum}
+import org.clulab.learning.{LibSVMClassifier, LinearKernel, RVFDataset, RVFDatum, LinearSVMClassifier}
 import org.clulab.struct.Counter
 
 object SVMTest extends App{
@@ -12,8 +12,8 @@ object SVMTest extends App{
   }
 
 
-  val classifier = new LibSVMClassifier[String, String](LinearKernel, C = 1, cacheSize = 100)
-
+  //val classifier = new LibSVMClassifier[String, String](LinearKernel, C = 1, cacheSize = 100)
+  val classifier2 = new LinearSVMClassifier[String,String](C = 1, eps = 0.001, bias = false)
 
   val dataset = new RVFDataset[String, String]()
 
@@ -24,10 +24,15 @@ object SVMTest extends App{
   dataset += d1
   dataset += d2
   dataset += d3
-  classifier.train(dataset)
+  //classifier.train(dataset)
+  classifier2.train(dataset)
 
   val dn = mkRVFDatum("+", List("good", "great", "bad", "new"))
-  println(classifier.classOf(d1))
+  /*println(classifier.classOf(d1))
   println(classifier.classOf(d2))
-  println(classifier.classOf(dn))
+  println(classifier.classOf(dn))*/
+  println(classifier2.classOf(d1))
+  println(classifier2.classOf(d2))
+  println(classifier2.classOf(dn))
+
 }
