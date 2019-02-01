@@ -36,7 +36,8 @@ object AggregatedRowNew {
             evt_dependencyFeatures += evt
           }
       case ctx:String if ctx.startsWith("ctxDepTail") =>
-        if(rowData(indices(ctx)) != "0.0") {
+        if(rowData(indices(ctx)) != "0.0")
+        {
           ctx_dependencyTails += (rowData(indices(ctx))).toDouble
           ctx_dependencyFeatures += ctx
         }
