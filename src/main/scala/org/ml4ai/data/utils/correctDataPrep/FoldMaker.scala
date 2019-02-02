@@ -1,6 +1,6 @@
 package org.ml4ai.data.utils.correctDataPrep
 
-import org.ml4ai.data.classifiers.{Baseline, DummyClassifier}
+import org.ml4ai.data.classifiers.{Baseline, DummyClassifier, LinearSVMWrapper}
 
 import scala.collection.mutable
 import scala.io.BufferedSource
@@ -73,6 +73,35 @@ object FoldMaker {
 
     }
     (giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  }
+
+  def svmController(svmInstance: LinearSVMWrapper, foldsFromCSV: Array[(Array[Int], Array[Int])], rows2: Seq[AggregatedRowNew]): (Array[Int], Array[Int]) = {
+    val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
+    val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
+    for((train,test) <- foldsFromCSV) {
+      val trainingData = train.collect{case x:Int => rows2(x)}
+      val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
+
+      val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
+      val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
+
+      val tups = svmInstance.constructTupsForRVF(balancedTrainingData)
+      val (trainDataSet, _) = svmInstance.mkRVFDataSet(labelsToInt,tups)
+      svmInstance.train(trainDataSet)
+
+
+      val testingData = test.collect{case t: Int => rows2(t)}
+      val testLabels = DummyClassifier.convertOptionalToBool(testingData)
+      val testLabelsTruth = DummyClassifier.convertBooleansToInt(testLabels)
+      giantTruthTestLabel ++= testLabelsTruth
+      val tupsTruth = svmInstance.constructTupsForRVF(testingData)
+      val (_, testDatumCollect) = svmInstance.mkRVFDataSet(testLabelsTruth, tupsTruth)
+      val testLabelsPred = testDatumCollect.map(td => svmInstance.predict(td))
+      giantPredTestLabel ++= testLabelsPred
+    }
+
+    (giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+
   }
 
 }

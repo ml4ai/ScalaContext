@@ -32,43 +32,27 @@ object Main extends App {
   val testTup = ("test", precTest, recallTest, f1Test)
   val baselineResults = Map("baseline" -> testTup)
   scoreDictionary ++= baselineResults
-
   //========================== CONCLUDING BASELINE RESULTS ==========================
 
 
-  // SVM classifier
+  // =========================== LINEAR SVM RESULTS ===========================
+  // svm instance using LibSVM with linear kernel
   //val SVMClassifier = new LibSVMClassifier[Int, String](LinearKernel, C= 0.001, eps = 0.001)
-  val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
   //val svmInstance = new SVM(SVMClassifier)
+
+  // svm instance using liblinear
+  val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
   val svmInstance = new LinearSVMWrapper(SVMClassifier)
-  val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
-  val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
-  val giantTruthValLabel = new mutable.ArrayBuffer[Int]()
-  val giantPredValLabel = new mutable.ArrayBuffer[Int]()
-  for((train,test) <- trainValCombined.toArray) {
-    val trainingData = train.collect{case x:Int => rows2(x)}
-    val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
 
-    val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
-    val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
-
-    val tups = svmInstance.constructTupsForRVF(balancedTrainingData)
-    val (trainDataSet, _) = svmInstance.mkRVFDataSet(labelsToInt,tups)
-    svmInstance.train(trainDataSet)
+  val (truthTestSVM, predTestSVM) = FoldMaker.svmController(svmInstance, trainValCombined.toArray, rows2)
+  val svmResult = svmInstance.scoreMaker("Linear SVM", truthTestSVM, predTestSVM)
+  scoreDictionary ++= svmResult
+  //========================== CONCLUDING LINEAR SVM RESULTS ==========================
 
 
-    val testingData = test.collect{case t: Int => rows2(t)}
-    val testLabels = DummyClassifier.convertOptionalToBool(testingData)
-    val testLabelsTruth = DummyClassifier.convertBooleansToInt(testLabels)
-    giantTruthTestLabel ++= testLabelsTruth
-    val tupsTruth = svmInstance.constructTupsForRVF(testingData)
-    val (_, testDatumCollect) = svmInstance.mkRVFDataSet(testLabelsTruth, tupsTruth)
-    val testLabelsPred = testDatumCollect.map(td => svmInstance.predict(td))
-    giantPredTestLabel ++= testLabelsPred
-  }
 
-  val svmScore = svmInstance.scoreMaker("Linear SVM",  giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
-  scoreDictionary ++= svmScore
   println("size of score dictionary: " + scoreDictionary.size)
   println(scoreDictionary)
+
+
 }
