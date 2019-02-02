@@ -42,7 +42,7 @@ object FoldMaker {
     toReturn.toArray
   }
 
-  def baselineController(foldsFromCSV: Array[(Array[Int], Array[Int], Array[Int])], rows2: Seq[AggregatedRowNew]): Map[String, ((String, Double, Double, Double), (String, Double, Double, Double))] = {
+  def baselineController(foldsFromCSV: Array[(Array[Int], Array[Int], Array[Int])], rows2: Seq[AggregatedRowNew]): (Array[Int], Array[Int]) = {
     val sentDistMinIndex = 18
     val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
     val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
@@ -72,12 +72,7 @@ object FoldMaker {
       giantPredTestLabel ++= predTestLabel
 
     }
-
-    val testCounts = Utils.predictCounts(giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
-    val precisionTest = Utils.precision(testCounts)
-    val recallTest = Utils.recall(testCounts)
-    val f1Test = Utils.f1(testCounts)
-    Map("baseline" -> (("validation", 0.0,0.0,0.0), ("test", precisionTest, recallTest, f1Test)))
+    (giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
   }
 
 }

@@ -3,12 +3,12 @@ package org.ml4ai.data.classifiers
 import org.ml4ai.data.utils.correctDataPrep.AggregatedRowNew
 
 object DummyClassifier extends ClassifierMask {
-  override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]) :Unit = ()
+  override def train(xTrain: Array[Array[Double]], yTrain: Array[Int]) :Unit = ()
 
   override def predict(xTest:Array[Array[Double]]): Array[Int] = List.fill(xTest.size)(1).toArray
 
-  override def scoreMaker(name: String, truth: Array[Int], predicted: Array[Int], truthTest:Array[Int], predTest:Array[Int]): Map[String, ((String, Double, Double, Double), (String, Double, Double, Double))] = {
-    Map("dummy" -> (("validation", 0.0, 0.0,0.0), ("test", 0.0,0.0,0.0)))
+  override def scoreMaker(name: String, truthTest:Array[Int], predTest:Array[Int]): Map[String,  (String, Double, Double, Double)] = {
+    Map("dummy" -> ("test", 0.0,0.0,0.0))
   }
   def convertBooleansToInt(labels: Seq[Boolean]):Array[Int] = {
 

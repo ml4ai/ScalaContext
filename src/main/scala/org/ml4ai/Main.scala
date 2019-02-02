@@ -20,17 +20,27 @@ object Main extends App {
     val toAdd = (trainVal.toArray, test)
     trainValCombined += toAdd
   }
+
+  // =========================== BASELINE RESULTS ===========================
   // baseline results
-  var scoreDictionary = collection.mutable.Map[String, ((String, Double, Double, Double), (String, Double, Double, Double))]()
-  val baselineResults = FoldMaker.baselineController(foldsFromCSV, rows2)
+  var scoreDictionary = collection.mutable.Map[String, (String, Double, Double, Double)]()
+  val (truthTest, predTest) = FoldMaker.baselineController(foldsFromCSV, rows2)
+  val countsTest = Utils.predictCounts(truthTest, predTest)
+  val precTest = Utils.precision(countsTest)
+  val recallTest = Utils.recall(countsTest)
+  val f1Test = Utils.f1(countsTest)
+  val testTup = ("test", precTest, recallTest, f1Test)
+  val baselineResults = Map("baseline" -> testTup)
   scoreDictionary ++= baselineResults
+
+  //========================== CONCLUDING BASELINE RESULTS ==========================
 
 
   // SVM classifier
-  val SVMClassifier = new LibSVMClassifier[Int, String](LinearKernel, C= 0.001, eps = 0.001)
-  //val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
-  val svmInstance = new SVM(SVMClassifier)
-  //val svmInstance = new LinearSVMWrapper(SVMClassifier)
+  //val SVMClassifier = new LibSVMClassifier[Int, String](LinearKernel, C= 0.001, eps = 0.001)
+  val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
+  //val svmInstance = new SVM(SVMClassifier)
+  val svmInstance = new LinearSVMWrapper(SVMClassifier)
   val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
   val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
   val giantTruthValLabel = new mutable.ArrayBuffer[Int]()
@@ -41,11 +51,10 @@ object Main extends App {
 
     val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
     val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
-    giantTruthTestLabel++=labelsToInt
 
     val tups = svmInstance.constructTupsForRVF(balancedTrainingData)
     val (trainDataSet, _) = svmInstance.mkRVFDataSet(labelsToInt,tups)
-    svmInstance.fit(trainDataSet)
+    svmInstance.train(trainDataSet)
 
 
     val testingData = test.collect{case t: Int => rows2(t)}
@@ -58,7 +67,7 @@ object Main extends App {
     giantPredTestLabel ++= testLabelsPred
   }
 
-  val svmScore = svmInstance.scoreMaker("Linear SVM", giantTruthValLabel.toArray, giantPredValLabel.toArray, giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  val svmScore = svmInstance.scoreMaker("Linear SVM",  giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
   scoreDictionary ++= svmScore
   println("size of score dictionary: " + scoreDictionary.size)
   println(scoreDictionary)

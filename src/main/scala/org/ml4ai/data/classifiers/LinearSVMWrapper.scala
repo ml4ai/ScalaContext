@@ -3,9 +3,9 @@ import org.clulab.struct.Counter
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Utils}
 import org.clulab.learning._
 case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends ClassifierMask {
-  override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]): Unit = ()
+  override def train(xTrain: Array[Array[Double]], yTrain: Array[Int]): Unit = ()
 
-  def fit(xTrain: RVFDataset[Int, String]):Unit = classifier.train(xTrain)
+  def train(xTrain: RVFDataset[Int, String]):Unit = classifier.train(xTrain)
 
   override def predict(xTest: Array[Array[Double]]): Array[Int] = List.fill(xTest.size)(1).toArray
 
@@ -13,19 +13,14 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
     classifier.classOf(testDatum)
   }
 
-  override def scoreMaker(name: String, truthVal: Array[Int], predVal: Array[Int], truthTest:Array[Int], predTest:Array[Int]): Map[String, ((String, Double, Double, Double), (String, Double, Double, Double))] = {
-    val countsVal = Utils.predictCounts(truthVal, predVal)
-    val precVal = Utils.precision(countsVal)
-    val recallVal = Utils.recall(countsVal)
-    val f1Val = Utils.f1(countsVal)
-    val valTup = ("validation", precVal, recallVal, f1Val)
+  override def scoreMaker(name: String, truthTest:Array[Int], predTest:Array[Int]): Map[String,  (String, Double, Double, Double)] = {
 
     val countsTest = Utils.predictCounts(truthTest, predTest)
     val precTest = Utils.precision(countsTest)
     val recallTest = Utils.recall(countsTest)
     val f1Test = Utils.f1(countsTest)
     val testTup = ("test", precTest, recallTest, f1Test)
-    val mapToReturn = Map(name -> (valTup, testTup))
+    val mapToReturn = Map(name -> testTup)
     mapToReturn
   }
 
