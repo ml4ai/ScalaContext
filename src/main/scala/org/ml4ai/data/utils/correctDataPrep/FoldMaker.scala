@@ -104,4 +104,33 @@ object FoldMaker {
 
   }
 
+  def gradBoostController(foldsFromCSV: Array[(Array[Int], Array[Int])], rows2: Seq[AggregatedRowNew]):(Array[Int], Array[Int]) = {
+    val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
+    val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
+    for((train,test) <- foldsFromCSV) {
+      val trainingData = train.collect{case x:Int => rows2(x)}
+      val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
+      val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
+      val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
+      val dataFrame = extractDataFromRow(trainingData)
+
+    }
+
+    def extractDataFromRow(dataSet:Seq[AggregatedRowNew]):Array[Array[Double]] = {
+      val featureValues = collection.mutable.ListBuffer[Array[Double]]()
+      val toReturn = collection.mutable.ListBuffer[Array[Double]]()
+      dataSet.map(featureValues+=_.featureGroups)
+      val sizeList = featureValues.map(_.size)
+      val maxSize = sizeList.max
+      featureValues.map(f => {
+        val missing = maxSize - f.size
+        val zeroArray = List.fill(missing)(0.0).toArray
+        val toAdd = f ++ zeroArray
+        toReturn += toAdd
+      })
+      toReturn.toArray
+    }
+    (giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  }
+
 }
