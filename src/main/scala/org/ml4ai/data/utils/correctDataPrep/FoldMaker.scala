@@ -1,6 +1,6 @@
 package org.ml4ai.data.utils.correctDataPrep
 
-import org.ml4ai.data.classifiers.{Baseline, DummyClassifier, LinearSVMWrapper}
+import org.ml4ai.data.classifiers.{Baseline, DummyClassifier, GradTreeBoost, LinearSVMWrapper}
 
 import scala.collection.mutable
 import scala.io.BufferedSource
@@ -90,6 +90,7 @@ object FoldMaker {
       svmInstance.train(trainDataSet)
 
 
+
       val testingData = test.collect{case t: Int => rows2(t)}
       val testLabels = DummyClassifier.convertOptionalToBool(testingData)
       val testLabelsTruth = DummyClassifier.convertBooleansToInt(testLabels)
@@ -112,25 +113,73 @@ object FoldMaker {
       val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
       val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
       val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
-      val dataFrame = extractDataFromRow(trainingData)
+      val (maxSize, dataFrame) = extractTrainingData(balancedTrainingData)
 
+
+
+      val gradTreeB = new GradTreeBoost(dataFrame, labelsToInt)
+
+
+      val testingData = test.collect{case t: Int => rows2(t)}
+      val testLabels = DummyClassifier.convertOptionalToBool(testingData)
+      val testLabelsTruth = DummyClassifier.convertBooleansToInt(testLabels)
+      giantTruthTestLabel ++= testLabelsTruth
+      val testDataFrame = extractTestingData(testingData, maxSize)
+      val testLabelsPred = gradTreeB.predict(testDataFrame)
+      giantPredTestLabel ++= testLabelsPred
+
+
+      //val miniDataFrame = dataFrame.take(339)
     }
 
-    def extractDataFromRow(dataSet:Seq[AggregatedRowNew]):Array[Array[Double]] = {
-      val featureValues = collection.mutable.ListBuffer[Array[Double]]()
-      val toReturn = collection.mutable.ListBuffer[Array[Double]]()
-      dataSet.map(featureValues+=_.featureGroups)
-      val sizeList = featureValues.map(_.size)
-      val maxSize = sizeList.max
-      featureValues.map(f => {
-        val missing = maxSize - f.size
-        val zeroArray = List.fill(missing)(0.0).toArray
-        val toAdd = f ++ zeroArray
-        toReturn += toAdd
-      })
-      toReturn.toArray
-    }
     (giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
   }
+
+  def extractTrainingData(dataSet:Seq[AggregatedRowNew]):(Int, Array[Array[Double]]) = {
+    val featureValues = collection.mutable.ArrayBuffer[Array[Double]]()
+    val toReturn = collection.mutable.ArrayBuffer[Array[Double]]()
+    dataSet.map(featureValues+=_.featureGroups)
+    val sizeList = featureValues.map(_.size)
+    val maxSize = sizeList.reduceLeft(_ max _)
+    featureValues.map(f => {
+      val missing = maxSize - f.size
+      if(missing == 0) toReturn += f
+      else{
+        val zeroArray = List.fill(missing)(0.0).toArray
+        val tempo = Array(f ++ zeroArray)
+        toReturn ++= tempo
+      }
+    })
+    (maxSize, toReturn.toArray)
+  }
+
+  def extractTestingData(dataSet:Seq[AggregatedRowNew], missingArraySize:Int):Array[Array[Double]] = {
+    val featureValues = collection.mutable.ArrayBuffer[Array[Double]]()
+    val toReturn = collection.mutable.ArrayBuffer[Array[Double]]()
+    dataSet.map(featureValues+=_.featureGroups)
+    val sizeList = featureValues.map(_.size)
+    val maxSize = sizeList.reduceLeft(_ max _)
+    featureValues.map(f => {
+      if(missingArraySize == 0) toReturn += f
+      else{
+        val zeroArray = List.fill(missingArraySize)(0.0).toArray
+        val tempo = Array(f ++ zeroArray)
+        toReturn ++= tempo
+      }
+    })
+    toReturn.toArray
+  }
+
+  def gbmScoreMaker(name: String, truthTest:Array[Int], predTest:Array[Int]): Map[String,  (String, Double, Double, Double)] = {
+
+    val countsTest = Utils.predictCounts(truthTest, predTest)
+    val precTest = Utils.precision(countsTest)
+    val recallTest = Utils.recall(countsTest)
+    val f1Test = Utils.f1(countsTest)
+    val testTup = ("test", precTest, recallTest, f1Test)
+    val mapToReturn = Map(name -> testTup)
+    mapToReturn
+  }
+
 
 }

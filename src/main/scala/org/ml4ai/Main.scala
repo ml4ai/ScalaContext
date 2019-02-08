@@ -16,10 +16,11 @@ object Main extends App {
   val foldsFromCSV = FoldMaker.getFoldsPerPaper(bufferedFoldIndices)
   val trainValCombined = collection.mutable.ListBuffer[(Array[Int], Array[Int])]()
   for((train,validate,test) <- foldsFromCSV) {
-    val trainVal = train.toSet ++ validate.toSet
-    val toAdd = (trainVal.toArray, test)
+    val trainVal = train ++ validate
+    val toAdd = (trainVal, test)
     trainValCombined += toAdd
   }
+
 
   // =========================== BASELINE RESULTS ===========================
   // baseline results
@@ -50,6 +51,11 @@ object Main extends App {
   //========================== CONCLUDING LINEAR SVM RESULTS ==========================
 
 
+  //=========================== GRADIENT TREE BOOST RESULTS ===========================
+  val (truthTestGBT, predTestGBT) = FoldMaker.gradBoostController(trainValCombined.toArray, rows2)
+  val gbtResult = FoldMaker.gbmScoreMaker("Gradient Tree Boost", truthTestGBT, predTestGBT)
+  scoreDictionary ++= gbtResult
+  //========================== CONCLUDING GRADIENT TREE BOOST RESULTS ==========================
 
   println("size of score dictionary: " + scoreDictionary.size)
   println(scoreDictionary)
