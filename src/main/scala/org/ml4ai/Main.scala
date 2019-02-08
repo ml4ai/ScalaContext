@@ -3,11 +3,8 @@ package org.ml4ai
 import java.util.zip._
 
 import org.clulab.learning.{LibSVMClassifier, LinearKernel, LinearSVMClassifier}
-
-import scala.collection.mutable
-import org.ml4ai.data.classifiers.{DummyClassifier, LinearSVMWrapper, SVM}
+import org.ml4ai.data.classifiers.{LinearSVMWrapper, SVM}
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Balancer, FoldMaker, Utils}
-//next steps: try LibLinear classifier, and make sure RVFDataSet allots accurate values to its features
 import scala.io.Source
 object Main extends App {
   val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))

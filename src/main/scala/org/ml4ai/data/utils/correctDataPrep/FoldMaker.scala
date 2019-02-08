@@ -116,7 +116,6 @@ object FoldMaker {
       val (maxSize, dataFrame) = extractTrainingData(balancedTrainingData)
 
 
-
       val gradTreeB = new GradTreeBoost(dataFrame, labelsToInt)
 
 
@@ -127,9 +126,6 @@ object FoldMaker {
       val testDataFrame = extractTestingData(testingData, maxSize)
       val testLabelsPred = gradTreeB.predict(testDataFrame)
       giantPredTestLabel ++= testLabelsPred
-
-
-      //val miniDataFrame = dataFrame.take(339)
     }
 
     (giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
@@ -157,8 +153,6 @@ object FoldMaker {
     val featureValues = collection.mutable.ArrayBuffer[Array[Double]]()
     val toReturn = collection.mutable.ArrayBuffer[Array[Double]]()
     dataSet.map(featureValues+=_.featureGroups)
-    val sizeList = featureValues.map(_.size)
-    val maxSize = sizeList.reduceLeft(_ max _)
     featureValues.map(f => {
       if(missingArraySize == 0) toReturn += f
       else{
