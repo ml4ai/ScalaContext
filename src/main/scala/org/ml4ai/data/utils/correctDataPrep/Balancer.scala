@@ -91,12 +91,13 @@ object Balancer {
     val neg_rows = rows.filter(_.label == Some(false))
     val posLength = pos_rows.size
     val negLength = neg_rows.size
+    val randomNumGen = new scala.util.Random(13)
     val all_rows: Iterable[AggregatedRowNew] = {
       if (negLength < posLength) {
         val numOfPos = negLength * negsPerPos
         if(numOfPos > posLength)
           throw new IllegalArgumentException("Requested balancing requires more pos examples than total present.")
-        val shuffled = scala.util.Random.shuffle(pos_rows.toList)
+        val shuffled = randomNumGen.shuffle(pos_rows.toList)
         val subShuffled = shuffled.slice(0,numOfPos)
         neg_rows.toList ::: subShuffled
       }
@@ -104,7 +105,7 @@ object Balancer {
         val numOfNeg = posLength * negsPerPos
         if(numOfNeg > negLength)
           throw new IllegalArgumentException("Requested balancing requires more neg examples than total present.")
-        val shuffled = scala.util.Random.shuffle(neg_rows.toList)
+        val shuffled = randomNumGen.shuffle(neg_rows.toList)
         val subShuffled = shuffled.slice(0,numOfNeg)
         pos_rows.toList ::: subShuffled
       }
