@@ -154,9 +154,10 @@ object FoldMaker {
     val toReturn = collection.mutable.ArrayBuffer[Array[Double]]()
     dataSet.map(featureValues+=_.featureGroups)
     featureValues.map(f => {
-      if(missingArraySize == 0) toReturn += f
+      val miss = missingArraySize - f.size
+      if(miss == 0) toReturn += f
       else{
-        val zeroArray = List.fill(missingArraySize)(0.0).toArray
+        val zeroArray = List.fill(miss)(0.0).toArray
         val tempo = Array(f ++ zeroArray)
         toReturn ++= tempo
       }
