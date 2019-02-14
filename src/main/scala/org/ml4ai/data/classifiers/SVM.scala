@@ -3,7 +3,7 @@ import org.clulab.learning.{LibSVMClassifier, LinearKernel, PolynomialKernel, RB
 import org.clulab.struct.Counter
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Utils}
 case class SVM(classifier: LibSVMClassifier[Int, String]) extends ClassifierMask {
-  override def train(xTrain: Array[Array[Double]], yTrain: Array[Int]) :Unit = ()
+  override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]) :Unit = ()
 
   def fit(xTrain: RVFDataset[Int, String]):Unit = classifier.train(xTrain)
 
