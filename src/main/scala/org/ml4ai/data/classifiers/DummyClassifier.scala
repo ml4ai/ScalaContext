@@ -3,7 +3,7 @@ package org.ml4ai.data.classifiers
 import org.ml4ai.data.utils.correctDataPrep.AggregatedRowNew
 
 object DummyClassifier extends ClassifierMask {
-  override def train(xTrain: Array[Array[Double]], yTrain: Array[Int]) :Unit = ()
+  override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]) :Unit = ()
 
   override def predict(xTest:Array[Array[Double]]): Array[Int] = List.fill(xTest.size)(1).toArray
 

@@ -3,9 +3,9 @@ import org.clulab.struct.Counter
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Utils}
 import org.clulab.learning._
 case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends ClassifierMask {
-  override def train(xTrain: Array[Array[Double]], yTrain: Array[Int]): Unit = ()
+  override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]): Unit = ()
 
-  def train(xTrain: RVFDataset[Int, String]):Unit = classifier.train(xTrain)
+  def fit(xTrain: RVFDataset[Int, String]):Unit = classifier.train(xTrain)
 
   override def predict(xTest: Array[Array[Double]]): Array[Int] = List.fill(xTest.size)(1).toArray
 

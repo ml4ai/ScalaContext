@@ -15,9 +15,9 @@ case class GradTreeBoost(xTrain:Array[Array[Double]], yTrain:Array[Int], nEst:In
     mapToReturn
   }
 
-  override def train(xTrain: Array[Array[Double]], yTrain: Array[Int]): Unit = ()
+  override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]): Unit = ()
 
-  def train(): GradientTreeBoost = {
+  def fit(): GradientTreeBoost = {
     gradBoostInstance
   }
 
