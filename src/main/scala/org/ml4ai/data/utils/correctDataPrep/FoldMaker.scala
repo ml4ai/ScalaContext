@@ -87,7 +87,7 @@ object FoldMaker {
 
       val tups = svmInstance.constructTupsForRVF(balancedTrainingData)
       val (trainDataSet, _) = svmInstance.mkRVFDataSet(labelsToInt,tups)
-      svmInstance.train(trainDataSet)
+      svmInstance.fit(trainDataSet)
 
 
 
