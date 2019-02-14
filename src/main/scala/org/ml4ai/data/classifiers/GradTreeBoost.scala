@@ -2,7 +2,7 @@ package org.ml4ai.data.classifiers
 import org.ml4ai.data.utils.correctDataPrep.Utils
 import smile.classification._
 case class GradTreeBoost(xTrain:Array[Array[Double]], yTrain:Array[Int], nEst:Int = 300) extends ClassifierMask {
-  private val gradBoostInstance = gbm(xTrain, yTrain, null, nEst)
+  private val gradBoostInstance = gbm(xTrain, yTrain, null, nEst, shrinkage = 0.1, subsample = 1.0)
   override def predict(xTest: Array[Array[Double]]): Array[Int] = xTest.map(gradBoostInstance.predict(_))
 
   override def scoreMaker(name: String, truthTest: Array[Int], predTest: Array[Int]): Map[String, (String, Double, Double, Double)] = {
