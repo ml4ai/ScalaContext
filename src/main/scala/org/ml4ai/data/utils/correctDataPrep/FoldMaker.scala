@@ -111,9 +111,10 @@ object FoldMaker {
     for((train,test) <- foldsFromCSV) {
       val trainingData = train.collect{case x:Int => rows2(x)}
       val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
+      val (maxSize, dataFrame) = extractTrainingData(balancedTrainingData)
+
       val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
       val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
-      val (maxSize, dataFrame) = extractTrainingData(balancedTrainingData)
 
 
       val gradTreeB = new GradTreeBoost(dataFrame, labelsToInt)
