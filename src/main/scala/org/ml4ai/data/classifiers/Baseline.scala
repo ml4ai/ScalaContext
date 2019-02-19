@@ -1,4 +1,7 @@
 package org.ml4ai.data.classifiers
+import java.io.Writer
+
+import org.clulab.learning.LinearSVMClassifier
 
 case class Baseline(k:Int) extends ClassifierMask {
   override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]): Unit = {}
@@ -16,4 +19,8 @@ case class Baseline(k:Int) extends ClassifierMask {
     val res = sentDistVals.map(s => if(s <= k) 1 else 0)
     res
   }
+
+  override def saveModel(fileName: String): Unit = ()
+
+  override def loadFrom(fileName: String): LinearSVMWrapper = null
 }

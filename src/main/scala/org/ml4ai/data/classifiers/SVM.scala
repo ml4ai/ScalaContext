@@ -1,5 +1,7 @@
 package org.ml4ai.data.classifiers
-import org.clulab.learning.{LibSVMClassifier, LinearKernel, PolynomialKernel, RBFKernel, RVFDataset, RVFDatum}
+import java.io.Writer
+
+import org.clulab.learning._
 import org.clulab.struct.Counter
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Utils}
 case class SVM(classifier: LibSVMClassifier[Int, String]) extends ClassifierMask {
@@ -59,6 +61,12 @@ case class SVM(classifier: LibSVMClassifier[Int, String]) extends ClassifierMask
     })
     toReturn.toArray
   }
+
+  override def saveModel(fileName: String): Unit = {
+    classifier.saveTo(fileName)
+  }
+
+  override def loadFrom(fileName: String): LinearSVMWrapper = null
 
 
 }

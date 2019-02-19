@@ -1,4 +1,6 @@
 package org.ml4ai.data.classifiers
+import java.io._
+
 import org.clulab.struct.Counter
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Utils}
 import org.clulab.learning._
@@ -23,6 +25,20 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
     val mapToReturn = Map(name -> testTup)
     mapToReturn
   }
+
+  override def saveModel(fileName: String): Unit = {
+    val os = new ObjectOutputStream(new FileOutputStream(fileName))
+    os.writeObject(this)
+    os.close()
+  }
+
+  override def loadFrom(fileName: String): LinearSVMWrapper = {
+    val is = new ObjectInputStream(new FileInputStream(fileName))
+    val c = is.readObject().asInstanceOf[LinearSVMWrapper]
+    is.close()
+    c
+  }
+
 
   // Consider features as pairs of (feature name, feature value)
   private def mkRVFDatum[L](label:L, features:Array[(String, Double)]):RVFDatum[L, String] = {

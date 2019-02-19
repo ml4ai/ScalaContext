@@ -2,10 +2,12 @@ package org.ml4ai
 
 import java.util.zip._
 
-import org.clulab.learning.{LibSVMClassifier, LinearKernel, LinearSVMClassifier}
+import org.clulab.learning.{LibSVMClassifier, LinearKernel, LinearSVMClassifier, PolynomialKernel}
 import org.ml4ai.data.classifiers.{LinearSVMWrapper, SVM}
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Balancer, FoldMaker, Utils}
+
 import scala.io.Source
+import java.io._
 object Main extends App {
   val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
   val rows2 = rows.filter(_.PMCID != "b'PMC4204162'")
@@ -34,24 +36,33 @@ object Main extends App {
 
 
   // =========================== LINEAR SVM RESULTS ===========================
+  val fileName = "./src/main/resources/svmModel.dat"
   // svm instance using LibSVM with linear kernel
   //val SVMClassifier = new LibSVMClassifier[Int, String](LinearKernel, C= 0.001, eps = 0.001)
-  //val svmInstance = new SVM(SVMClassifier)
+  //val SVMClassifier = new LibSVMClassifier[Int, String](PolynomialKernel, C= 10, degree = 3, gamma = 0.0001)
+  /*val svmInstance = new SVM(SVMClassifier)
+  svmInstance.saveModel("./src/main/resources/svmModel.dat")
+  val (truthTestSVM, predTestSVM) = FoldMaker.svmControllerLibSVM(svmInstance, trainValCombined.toArray, rows2)*/
 
   // svm instance using liblinear
   val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
   val svmInstance = new LinearSVMWrapper(SVMClassifier)
+  svmInstance.saveModel(fileName)
+  val loadedModel = svmInstance.loadFrom(fileName)
+  // the loadedModel variable is an instance of LinearSVMWrapper. If you want access to the LinearSVMClassifier instance,
+  // just call loadedModel.classifier.
 
-  val (truthTestSVM, predTestSVM) = FoldMaker.svmController(svmInstance, trainValCombined.toArray, rows2)
+  //val (truthTestSVM, predTestSVM) = FoldMaker.svmControllerLinearSVM(svmInstance, trainValCombined.toArray, rows2)
+  val (truthTestSVM, predTestSVM) = FoldMaker.svmControllerLinearSVM(loadedModel, trainValCombined.toArray, rows2)
   val svmResult = svmInstance.scoreMaker("Linear SVM", truthTestSVM, predTestSVM)
   scoreDictionary ++= svmResult
   //========================== CONCLUDING LINEAR SVM RESULTS ==========================
 
 
   //=========================== GRADIENT TREE BOOST RESULTS ===========================
-  val (truthTestGBT, predTestGBT) = FoldMaker.gradBoostController(trainValCombined.toArray, rows2)
+  /*val (truthTestGBT, predTestGBT) = FoldMaker.gradBoostController(trainValCombined.toArray, rows2)
   val gbtResult = FoldMaker.gbmScoreMaker("Gradient Tree Boost", truthTestGBT, predTestGBT)
-  scoreDictionary ++= gbtResult
+  scoreDictionary ++= gbtResult*/
   //========================== CONCLUDING GRADIENT TREE BOOST RESULTS ==========================
 
   println("size of score dictionary: " + scoreDictionary.size)

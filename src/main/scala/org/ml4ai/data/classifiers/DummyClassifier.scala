@@ -1,5 +1,8 @@
 package org.ml4ai.data.classifiers
 
+import java.io.Writer
+
+import org.clulab.learning.LinearSVMClassifier
 import org.ml4ai.data.utils.correctDataPrep.AggregatedRowNew
 
 object DummyClassifier extends ClassifierMask {
@@ -25,4 +28,8 @@ object DummyClassifier extends ClassifierMask {
       case _ => false
     })
   }
+
+  override def saveModel(fileName: String): Unit = ()
+
+  override def loadFrom(fileName: String): LinearSVMWrapper = null
 }
