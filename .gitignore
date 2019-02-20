@@ -66,3 +66,4 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
+/Users/shraddha/datascience/ScalaContext/src/main/resources/svmModel.dat
