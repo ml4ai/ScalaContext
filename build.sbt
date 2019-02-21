@@ -4,10 +4,10 @@ lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
       organization := "org.ml4ai",
-      scalaVersion := "2.12.6",
+      scalaVersion := "2.11.11",
       version      := "0.1.0-SNAPSHOT"
     )),
-    name := "ScalaContext",
+    name := "scalacontext",
     libraryDependencies ++= Seq(
       scalaTest % Test,
       "com.typesafe" % "config" % "1.3.2"
@@ -16,7 +16,7 @@ lazy val root = (project in file(".")).
 
 libraryDependencies ++= Seq(
   "com.github.haifengl" %% "smile-scala" % "1.5.1",
-  "org.clulab" %% "processors-main" % "7.4.2",
+  "org.clulab" %% "processors-main" % "7.4.2"
 )
 
 
