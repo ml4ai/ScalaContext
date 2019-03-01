@@ -70,10 +70,17 @@ object AggregatedRowNew {
     val source = Source.fromInputStream(stream)
     val lines = source.getLines()
     val headers = lines.next() split ","
-    val features = allOtherFeatures(headers)
-    val ixs = indices(headers)
-    val ret = lines.map(l => AggregatedRowNew(l, headers, features, ixs)).toList
+    val rectifiedHeaders = rectifyWrongFeatures(headers)
+    val features = allOtherFeatures(rectifiedHeaders)
+    val ixs = indices(rectifiedHeaders)
+    val ret = lines.map(l => AggregatedRowNew(l, rectifiedHeaders, features, ixs)).toList
     source.close()
-    (headers, ret)
+    (rectifiedHeaders, ret)
+  }
+
+  def rectifyWrongFeatures(headers:Seq[String]): Seq[String] = {
+    val result = collection.mutable.ListBuffer[String]()
+    headers.map(h => if(headers.indexOf(h) == 1) result += "PMCID" else result += h)
+    result
   }
 }
