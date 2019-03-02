@@ -7,7 +7,6 @@ import org.ml4ai.data.classifiers.{LinearSVMWrapper, SVM}
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Balancer, FoldMaker, Utils}
 
 import scala.io.Source
-import java.io._
 object Main extends App {
   val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
   val rows2 = rows.filter(_.PMCID != "b'PMC4204162'")

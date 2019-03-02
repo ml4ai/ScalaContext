@@ -36,6 +36,7 @@ object SVMTrainSaveInstance extends App {
     map += ("Non_Dependency_Features" -> nonDepFeatures.toSeq)
     map += ("NonDep_Context" -> (nonDepFeatures ++ contextDepFeatures.toSet).toSeq)
     map += ("NonDep_Event" -> (nonDepFeatures ++ eventDepFeatures.toSet).toSeq)
+    map += ("Context_Event" -> (contextDepFeatures.toSet ++ eventDepFeatures.toSet).toSeq)
     map.toMap
   }
 
@@ -48,7 +49,15 @@ object SVMTrainSaveInstance extends App {
       val currentLabel = d.label
       val currentFeatureName = d.featureGroupNames
       val currentFeatureValues = d.featureGroups
-      val indexList = featureSet.map(f => currentFeatureName.indexOf(f))
+      val indexList = collection.mutable.ListBuffer[Int]()
+      // we need to check if the feature is present in the current row. Only if it is present, should we try to access its' value.
+      // if not, i.e. if the feature is not present and we try to access it, then we get an ArrayIndexOutOfBound -1 error/
+      featureSet.map(f => {
+        if(currentFeatureName.contains(f)) {
+          val tempIndex = currentFeatureName.indexOf(f)
+          indexList += tempIndex
+        }
+      })
       val valueList = indexList.map(i => currentFeatureValues(i))
       AggregatedRowNew(currentSent, currentPMCID, currentEvtId, currentContextID, currentLabel, valueList.toArray, featureSet.toArray)
     })
