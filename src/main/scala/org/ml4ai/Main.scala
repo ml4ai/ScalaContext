@@ -2,9 +2,9 @@ package org.ml4ai
 
 import java.util.zip._
 
-import org.clulab.learning.{LibSVMClassifier, LinearKernel, LinearSVMClassifier, PolynomialKernel}
+import org.clulab.learning.{LinearSVMClassifier}
 import org.ml4ai.data.classifiers.{LinearSVMWrapper, SVM}
-import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Balancer, FoldMaker, Utils}
+import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, FoldMaker, Utils}
 
 import scala.io.Source
 object Main extends App {
@@ -36,12 +36,6 @@ object Main extends App {
 
   // =========================== LINEAR SVM RESULTS ===========================
   val fileName = "./src/main/resources/svmModel.dat"
-  // svm instance using LibSVM with linear kernel
-  //val SVMClassifier = new LibSVMClassifier[Int, String](LinearKernel, C= 0.001, eps = 0.001)
-  //val SVMClassifier = new LibSVMClassifier[Int, String](PolynomialKernel, C= 10, degree = 3, gamma = 0.0001)
-  /*val svmInstance = new SVM(SVMClassifier)
-  svmInstance.saveModel("./src/main/resources/svmModel.dat")
-  val (truthTestSVM, predTestSVM) = FoldMaker.svmControllerLibSVM(svmInstance, trainValCombined.toArray, rows2)*/
 
   // svm instance using liblinear
   val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)

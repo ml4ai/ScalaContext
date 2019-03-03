@@ -50,7 +50,7 @@ object SVMTrainSaveInstance extends App {
       val currentFeatureName = d.featureGroupNames
       val currentFeatureValues = d.featureGroups
       val indexList = collection.mutable.ListBuffer[Int]()
-      // we need to check if the feature is present in the current row. Only if it is present, should we try to access its' value.
+      // we need to check if the feature is present in the current row. Only if it is present should we try to access its' value.
       // if not, i.e. if the feature is not present and we try to access it, then we get an ArrayIndexOutOfBound -1 error/
       featureSet.map(f => {
         if(currentFeatureName.contains(f)) {
