@@ -10,9 +10,6 @@ object DummyClassifier extends ClassifierMask {
 
   override def predict(xTest:Array[Array[Double]]): Array[Int] = List.fill(xTest.size)(1).toArray
 
-  override def scoreMaker(name: String, truthTest:Array[Int], predTest:Array[Int]): Map[String,  (String, Double, Double, Double)] = {
-    Map("dummy" -> ("test", 0.0,0.0,0.0))
-  }
   def convertBooleansToInt(labels: Seq[Boolean]):Array[Int] = {
 
     val toReturn = labels.map(l => l match {

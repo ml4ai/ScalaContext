@@ -3,7 +3,7 @@ package org.ml4ai
 import java.util.zip._
 
 import org.clulab.learning.{LinearSVMClassifier}
-import org.ml4ai.data.classifiers.{LinearSVMWrapper, SVM}
+import org.ml4ai.data.classifiers.LinearSVMWrapper
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, FoldMaker, Utils}
 
 import scala.io.Source
@@ -24,12 +24,7 @@ object Main extends App {
   // baseline results
   var scoreDictionary = collection.mutable.Map[String, (String, Double, Double, Double)]()
   val (truthTest, predTest) = FoldMaker.baselineController(foldsFromCSV, rows2)
-  val countsTest = Utils.predictCounts(truthTest, predTest)
-  val precTest = Utils.precision(countsTest)
-  val recallTest = Utils.recall(countsTest)
-  val f1Test = Utils.f1(countsTest)
-  val testTup = ("test", precTest, recallTest, f1Test)
-  val baselineResults = Map("baseline" -> testTup)
+  val baselineResults = Utils.scoreMaker("baseline", truthTest, predTest)
   scoreDictionary ++= baselineResults
   //========================== CONCLUDING BASELINE RESULTS ==========================
 
@@ -47,14 +42,14 @@ object Main extends App {
 
   //val (truthTestSVM, predTestSVM) = FoldMaker.svmControllerLinearSVM(svmInstance, trainValCombined.toArray, rows2)
   val (truthTestSVM, predTestSVM) = FoldMaker.svmControllerLinearSVM(loadedModel, trainValCombined.toArray, rows2)
-  val svmResult = svmInstance.scoreMaker("Linear SVM", truthTestSVM, predTestSVM)
+  val svmResult = Utils.scoreMaker("Linear SVM", truthTestSVM, predTestSVM)
   scoreDictionary ++= svmResult
   //========================== CONCLUDING LINEAR SVM RESULTS ==========================
 
 
   //=========================== GRADIENT TREE BOOST RESULTS ===========================
   /*val (truthTestGBT, predTestGBT) = FoldMaker.gradBoostController(trainValCombined.toArray, rows2)
-  val gbtResult = FoldMaker.gbmScoreMaker("Gradient Tree Boost", truthTestGBT, predTestGBT)
+  val gbtResult = Utils.scoreMaker("Gradient Tree Boost", truthTestGBT, predTestGBT)
   scoreDictionary ++= gbtResult*/
   //========================== CONCLUDING GRADIENT TREE BOOST RESULTS ==========================
 

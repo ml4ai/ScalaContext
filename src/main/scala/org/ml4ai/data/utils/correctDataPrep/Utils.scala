@@ -44,4 +44,14 @@ object Utils {
     Map(("TP" -> TP), ("FP" -> FP), ("TN" -> TN), ("FN" -> FN))
   }
 
+  def scoreMaker(name: String, truthTest:Array[Int], predTest:Array[Int]):Map[String, (String, Double, Double, Double)] = {
+    val countsTest = Utils.predictCounts(truthTest, predTest)
+    val precTest = Utils.precision(countsTest)
+    val recallTest = Utils.recall(countsTest)
+    val f1Test = Utils.f1(countsTest)
+    val testTup = ("test", precTest, recallTest, f1Test)
+    val mapToReturn = Map(name -> testTup)
+    mapToReturn
+  }
+
 }

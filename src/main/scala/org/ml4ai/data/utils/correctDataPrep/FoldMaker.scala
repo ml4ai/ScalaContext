@@ -1,6 +1,6 @@
 package org.ml4ai.data.utils.correctDataPrep
 
-import org.ml4ai.data.classifiers.{Baseline, DummyClassifier, GradTreeBoost, LinearSVMWrapper, SVM}
+import org.ml4ai.data.classifiers.{Baseline, DummyClassifier, GradTreeBoost, LinearSVMWrapper}
 
 import scala.collection.mutable
 import scala.io.BufferedSource
@@ -11,7 +11,7 @@ case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRo
 
 object FoldMaker {
 
-  def extractData(rows: Seq[AggregatedRowNew], sentMinIndex: Int): Array[Array[Double]] = {
+  def extractSentDistData(rows: Seq[AggregatedRowNew], sentMinIndex: Int): Array[Array[Double]] = {
     val returnValue = new mutable.ListBuffer[Array[Double]]()
     rows.map(r => {
       val temp = r.featureGroups(sentMinIndex)
@@ -50,7 +50,7 @@ object FoldMaker {
       val trainingData = train.collect{case x:Int => rows2(x)}
       val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
 
-      val sentDistTrainFrame = FoldMaker.extractData(balancedTrainingData, sentDistMinIndex)
+      val sentDistTrainFrame = FoldMaker.extractSentDistData(balancedTrainingData, sentDistMinIndex)
       val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
       val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
       val kToF1Map = new mutable.HashMap[Int, Double]
@@ -63,7 +63,7 @@ object FoldMaker {
       }
       val bestK = Utils.argMax(kToF1Map.toMap)
       val testingData = test.collect{case x:Int => rows2(x)}
-      val testSentFrame = FoldMaker.extractData(testingData, sentDistMinIndex)
+      val testSentFrame = FoldMaker.extractSentDistData(testingData, sentDistMinIndex)
       val currentTruthTest = DummyClassifier.convertOptionalToBool(testingData)
       val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
       giantTruthTestLabel ++= currentTruthTestInt
@@ -167,16 +167,9 @@ object FoldMaker {
     toReturn.toArray
   }
 
-  def gbmScoreMaker(name: String, truthTest:Array[Int], predTest:Array[Int]): Map[String,  (String, Double, Double, Double)] = {
 
-    val countsTest = Utils.predictCounts(truthTest, predTest)
-    val precTest = Utils.precision(countsTest)
-    val recallTest = Utils.recall(countsTest)
-    val f1Test = Utils.f1(countsTest)
-    val testTup = ("test", precTest, recallTest, f1Test)
-    val mapToReturn = Map(name -> testTup)
-    mapToReturn
-  }
+
+
 
 
 }

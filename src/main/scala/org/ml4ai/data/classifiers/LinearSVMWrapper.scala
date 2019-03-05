@@ -15,17 +15,6 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
     classifier.classOf(testDatum)
   }
 
-  override def scoreMaker(name: String, truthTest:Array[Int], predTest:Array[Int]): Map[String,  (String, Double, Double, Double)] = {
-
-    val countsTest = Utils.predictCounts(truthTest, predTest)
-    val precTest = Utils.precision(countsTest)
-    val recallTest = Utils.recall(countsTest)
-    val f1Test = Utils.f1(countsTest)
-    val testTup = ("test", precTest, recallTest, f1Test)
-    val mapToReturn = Map(name -> testTup)
-    mapToReturn
-  }
-
   override def saveModel(fileName: String): Unit = {
     val os = new ObjectOutputStream(new FileOutputStream(fileName))
     os.writeObject(this)
@@ -74,5 +63,6 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
     })
     toReturn.toArray
   }
+
 
 }
