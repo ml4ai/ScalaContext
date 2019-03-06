@@ -12,13 +12,7 @@ object Main extends App {
   val rows2 = rows.filter(_.PMCID != "b'PMC4204162'")
   val bufferedFoldIndices = Source.fromFile("./src/main/resources/cv_folds_val_4.csv")
   val foldsFromCSV = FoldMaker.getFoldsPerPaper(bufferedFoldIndices)
-  val trainValCombined = collection.mutable.ListBuffer[(Array[Int], Array[Int])]()
-  for((train,validate,test) <- foldsFromCSV) {
-    val trainVal = train ++ validate
-    val toAdd = (trainVal, test)
-    trainValCombined += toAdd
-  }
-
+  val trainValCombined = Utils.combineTrainVal(foldsFromCSV)
 
   // =========================== BASELINE RESULTS ===========================
   // baseline results
@@ -45,7 +39,6 @@ object Main extends App {
   val svmResult = Utils.scoreMaker("Linear SVM", truthTestSVM, predTestSVM)
   scoreDictionary ++= svmResult
   //========================== CONCLUDING LINEAR SVM RESULTS ==========================
-
 
   println("size of score dictionary: " + scoreDictionary.size)
   println(scoreDictionary)

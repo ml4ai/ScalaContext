@@ -1,7 +1,6 @@
 package org.ml4ai.data.utils.correctDataPrep
 
-import org.ml4ai.data.classifiers.{Baseline, DummyClassifier, GradTreeBoost, LinearSVMWrapper}
-
+import org.ml4ai.data.classifiers.{Baseline, LinearSVMWrapper}
 import scala.collection.mutable
 import scala.io.BufferedSource
 case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRowNew]) extends Iterable[(Array[Int], Array[Int], Array[Int])]{
@@ -80,12 +79,4 @@ object FoldMaker {
     (giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
 
   }
-
-
-  def crossValLoop(name: String, data:Seq[AggregatedRowNew]):(Array[Int], Array[Int]) = {
-    (Array(0), Array(0))
-  }
-
-
-
 }

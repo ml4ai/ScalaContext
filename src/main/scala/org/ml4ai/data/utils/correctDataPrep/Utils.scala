@@ -1,5 +1,7 @@
 package org.ml4ai.data.utils.correctDataPrep
 
+import org.ml4ai.Main.foldsFromCSV
+
 object Utils {
   def argMax(values:Map[Int, Double]):Int = {
     var bestK = Integer.MIN_VALUE
@@ -52,6 +54,16 @@ object Utils {
     val testTup = ("test", precTest, recallTest, f1Test)
     val mapToReturn = Map(name -> testTup)
     mapToReturn
+  }
+
+  def combineTrainVal(folds: Array[(Array[Int], Array[Int], Array[Int])]):Array[(Array[Int], Array[Int])] = {
+    val trainValCombined = collection.mutable.ListBuffer[(Array[Int], Array[Int])]()
+    for((train,validate,test) <- folds) {
+      val trainVal = train ++ validate
+      val toAdd = (trainVal, test)
+      trainValCombined += toAdd
+    }
+    trainValCombined.toArray
   }
 
 }
