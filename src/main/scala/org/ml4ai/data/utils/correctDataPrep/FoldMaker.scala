@@ -67,23 +67,13 @@ object FoldMaker {
     for((train,test) <- foldsFromCSV) {
       val trainingData = train.collect{case x:Int => rows2(x)}
       val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
-
-      val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
-      val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
-
-      val tups = svmInstance.constructTupsForRVF(balancedTrainingData)
-      val (trainDataSet, _) = svmInstance.mkRVFDataSet(labelsToInt,tups)
+      val (trainDataSet, _) = svmInstance.dataConverter(balancedTrainingData)
       svmInstance.fit(trainDataSet)
 
-
-
       val testingData = test.collect{case t: Int => rows2(t)}
-      val testLabels = DummyClassifier.convertOptionalToBool(testingData)
-      val testLabelsTruth = DummyClassifier.convertBooleansToInt(testLabels)
+      val testLabelsTruth = svmInstance.createLabels(testingData)
       giantTruthTestLabel ++= testLabelsTruth
-      val tupsTruth = svmInstance.constructTupsForRVF(testingData)
-      val (_, testDatumCollect) = svmInstance.mkRVFDataSet(testLabelsTruth, tupsTruth)
-      val testLabelsPred = testDatumCollect.map(td => svmInstance.predict(td))
+      val testLabelsPred = svmInstance.predict(testingData)
       giantPredTestLabel ++= testLabelsPred
     }
 

@@ -10,8 +10,9 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
   def fit(xTrain: RVFDataset[Int, String]):Unit = classifier.train(xTrain)
 
   override def predict(data: Seq[AggregatedRowNew]): Array[Int] = {
+    val (_, individualRows) = dataConverter(data)
 
-    List.fill(data.size)(1).toArray}
+    individualRows.map(classifier.classOf(_))}
 
   def predict(testDatum:RVFDatum[Int, String]):Int = {
     classifier.classOf(testDatum)
@@ -66,9 +67,20 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
     toReturn.toArray
   }
 
-  /*def dataConverter(data:Seq[AggregatedRowNew]):RVFDataset[Int, String] = {
+  def dataConverter(data:Seq[AggregatedRowNew], existingLabels: Option[Array[Int]] = None):(RVFDataset[Int, String], Array[RVFDatum[Int, String]]) = {
     val tups = constructTupsForRVF(data)
-  }*/
+    val labels = existingLabels match {
+      case None => createLabels(data)
+      case Some(x) => x }
+    val result = mkRVFDataSet(labels, tups)
+    result
+  }
+
+  def createLabels(data:Seq[AggregatedRowNew]):Array[Int] = {
+    val currentTruthTest = DummyClassifier.convertOptionalToBool(data)
+    val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
+    currentTruthTestInt
+  }
 
 
 }
