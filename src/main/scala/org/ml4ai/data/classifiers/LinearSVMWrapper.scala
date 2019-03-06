@@ -5,11 +5,13 @@ import org.clulab.struct.Counter
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Utils}
 import org.clulab.learning._
 case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends ClassifierMask {
-  override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]): Unit = ()
+  override def fit(xTrain: Seq[AggregatedRowNew]): Unit = ()
 
   def fit(xTrain: RVFDataset[Int, String]):Unit = classifier.train(xTrain)
 
-  override def predict(xTest: Array[Array[Double]]): Array[Int] = List.fill(xTest.size)(1).toArray
+  override def predict(data: Seq[AggregatedRowNew]): Array[Int] = {
+
+    List.fill(data.size)(1).toArray}
 
   def predict(testDatum:RVFDatum[Int, String]):Int = {
     classifier.classOf(testDatum)
@@ -63,6 +65,10 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
     })
     toReturn.toArray
   }
+
+  /*def dataConverter(data:Seq[AggregatedRowNew]):RVFDataset[Int, String] = {
+    val tups = constructTupsForRVF(data)
+  }*/
 
 
 }

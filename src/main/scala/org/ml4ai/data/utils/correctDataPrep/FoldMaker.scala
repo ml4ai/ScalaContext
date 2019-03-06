@@ -11,15 +11,6 @@ case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRo
 
 object FoldMaker {
 
-  def extractSentDistData(rows: Seq[AggregatedRowNew], sentMinIndex: Int): Array[Array[Double]] = {
-    val returnValue = new mutable.ListBuffer[Array[Double]]()
-    rows.map(r => {
-      val temp = r.featureGroups(sentMinIndex)
-      val array = Array(temp)
-    returnValue += array })
-    returnValue.toArray
-  }
-
   def getFoldsPerPaper(bufSource:BufferedSource):Array[(Array[Int], Array[Int], Array[Int])] = {
     val perPaperLines = bufSource.getLines()
     val toReturn = collection.mutable.ListBuffer[(Array[Int], Array[Int], Array[Int])]()
@@ -43,32 +34,27 @@ object FoldMaker {
   }
 
   def baselineController(foldsFromCSV: Array[(Array[Int], Array[Int], Array[Int])], rows2: Seq[AggregatedRowNew]): (Array[Int], Array[Int]) = {
-    val sentDistMinIndex = 18
     val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
     val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
     for((train,_,test) <- foldsFromCSV) {
       val trainingData = train.collect{case x:Int => rows2(x)}
       val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
-
-      val sentDistTrainFrame = FoldMaker.extractSentDistData(balancedTrainingData, sentDistMinIndex)
-      val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
-      val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
       val kToF1Map = new mutable.HashMap[Int, Double]
       for(k_val <- 0 until 51) {
         val trainInstance = new Baseline(k_val)
-        val pred = trainInstance.predict(sentDistTrainFrame)
+        val pred = trainInstance.predict(balancedTrainingData)
+        val labelsToInt = trainInstance.createLabels(balancedTrainingData)
         val counts = Utils.predictCounts(labelsToInt, pred)
         val f1score = Utils.f1(counts)
         kToF1Map += (k_val -> f1score)
       }
       val bestK = Utils.argMax(kToF1Map.toMap)
-      val testingData = test.collect{case x:Int => rows2(x)}
-      val testSentFrame = FoldMaker.extractSentDistData(testingData, sentDistMinIndex)
-      val currentTruthTest = DummyClassifier.convertOptionalToBool(testingData)
-      val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
-      giantTruthTestLabel ++= currentTruthTestInt
       val testInstance = new Baseline(bestK)
-      val predTestLabel = testInstance.predict(testSentFrame)
+      val testingData = test.collect{case x:Int => rows2(x)}
+      val currentTruthTestInt = testInstance.createLabels(testingData)
+      giantTruthTestLabel ++= currentTruthTestInt
+
+      val predTestLabel = testInstance.predict(testingData)
       giantPredTestLabel ++= predTestLabel
 
     }
@@ -106,69 +92,9 @@ object FoldMaker {
   }
 
 
-  def gradBoostController(foldsFromCSV: Array[(Array[Int], Array[Int])], rows2: Seq[AggregatedRowNew]):(Array[Int], Array[Int]) = {
-    val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
-    val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
-    for((train,test) <- foldsFromCSV) {
-      val trainingData = train.collect{case x:Int => rows2(x)}
-      val balancedTrainingData = Balancer.balanceByPaperAgg(trainingData, 1)
-      val (maxSize, dataFrame) = extractTrainingData(balancedTrainingData)
-
-      val trainingLabels = DummyClassifier.convertOptionalToBool(balancedTrainingData)
-      val labelsToInt = DummyClassifier.convertBooleansToInt(trainingLabels)
-
-
-      val gradTreeB = new GradTreeBoost(dataFrame, labelsToInt)
-
-
-      val testingData = test.collect{case t: Int => rows2(t)}
-      val testLabels = DummyClassifier.convertOptionalToBool(testingData)
-      val testLabelsTruth = DummyClassifier.convertBooleansToInt(testLabels)
-      giantTruthTestLabel ++= testLabelsTruth
-      val testDataFrame = extractTestingData(testingData, maxSize)
-      val testLabelsPred = gradTreeB.predict(testDataFrame)
-      giantPredTestLabel ++= testLabelsPred
-    }
-
-    (giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
+  def crossValLoop(name: String, data:Seq[AggregatedRowNew]):(Array[Int], Array[Int]) = {
+    (Array(0), Array(0))
   }
-
-  def extractTrainingData(dataSet:Seq[AggregatedRowNew]):(Int, Array[Array[Double]]) = {
-    val featureValues = collection.mutable.ArrayBuffer[Array[Double]]()
-    val toReturn = collection.mutable.ArrayBuffer[Array[Double]]()
-    dataSet.map(featureValues+=_.featureGroups)
-    val sizeList = featureValues.map(_.size)
-    val maxSize = sizeList.reduceLeft(_ max _)
-    featureValues.map(f => {
-      val missing = maxSize - f.size
-      if(missing == 0) toReturn += f
-      else{
-        val zeroArray = List.fill(missing)(0.0).toArray
-        val tempo = Array(f ++ zeroArray)
-        toReturn ++= tempo
-      }
-    })
-    (maxSize, toReturn.toArray)
-  }
-
-  def extractTestingData(dataSet:Seq[AggregatedRowNew], missingArraySize:Int):Array[Array[Double]] = {
-    val featureValues = collection.mutable.ArrayBuffer[Array[Double]]()
-    val toReturn = collection.mutable.ArrayBuffer[Array[Double]]()
-    dataSet.map(featureValues+=_.featureGroups)
-    featureValues.map(f => {
-      val miss = missingArraySize - f.size
-      if(miss == 0) toReturn += f
-      else{
-        val zeroArray = List.fill(miss)(0.0).toArray
-        val tempo = Array(f ++ zeroArray)
-        toReturn ++= tempo
-      }
-    })
-    toReturn.toArray
-  }
-
-
-
 
 
 

@@ -1,14 +1,10 @@
 package org.ml4ai.data.classifiers
-
-import java.io.Writer
-
-import org.clulab.learning.LinearSVMClassifier
 import org.ml4ai.data.utils.correctDataPrep.AggregatedRowNew
 
 object DummyClassifier extends ClassifierMask {
-  override def fit(xTrain: Array[Array[Double]], yTrain: Array[Int]) :Unit = ()
+  override def fit(xTrain: Seq[AggregatedRowNew]):Unit = ()
 
-  override def predict(xTest:Array[Array[Double]]): Array[Int] = List.fill(xTest.size)(1).toArray
+  override def predict(xTest: Seq[AggregatedRowNew]): Array[Int] = List.fill(xTest.size)(1).toArray
 
   def convertBooleansToInt(labels: Seq[Boolean]):Array[Int] = {
 

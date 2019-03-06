@@ -47,12 +47,6 @@ object Main extends App {
   //========================== CONCLUDING LINEAR SVM RESULTS ==========================
 
 
-  //=========================== GRADIENT TREE BOOST RESULTS ===========================
-  /*val (truthTestGBT, predTestGBT) = FoldMaker.gradBoostController(trainValCombined.toArray, rows2)
-  val gbtResult = Utils.scoreMaker("Gradient Tree Boost", truthTestGBT, predTestGBT)
-  scoreDictionary ++= gbtResult*/
-  //========================== CONCLUDING GRADIENT TREE BOOST RESULTS ==========================
-
   println("size of score dictionary: " + scoreDictionary.size)
   println(scoreDictionary)
 
