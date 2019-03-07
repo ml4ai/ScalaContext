@@ -1,7 +1,5 @@
 package org.ml4ai.data.utils.correctDataPrep
-
-import org.ml4ai.Main.foldsFromCSV
-
+import java.io._
 object Utils {
   def argMax(values:Map[Int, Double]):Int = {
     var bestK = Integer.MIN_VALUE
@@ -64,6 +62,29 @@ object Utils {
       trainValCombined += toAdd
     }
     trainValCombined.toArray
+  }
+
+  def createFeatureDictionary(numericFeatures: Seq[String]):Map[String, Seq[String]] = {
+    val contextDepFeatures = numericFeatures.filter(_.startsWith("ctxDepTail"))
+    val eventDepFeatures = numericFeatures.filter(_.startsWith("evtDepTail"))
+    val nonDepFeatures = numericFeatures.toSet -- (contextDepFeatures.toSet ++ eventDepFeatures.toSet)
+    val map = collection.mutable.Map[String, Seq[String]]()
+    map += ("All_features" -> numericFeatures)
+    map += ("Non_Dependency_Features" -> nonDepFeatures.toSeq)
+    map += ("NonDep_Context" -> (nonDepFeatures ++ contextDepFeatures.toSet).toSeq)
+    map += ("NonDep_Event" -> (nonDepFeatures ++ eventDepFeatures.toSet).toSeq)
+    map += ("Context_Event" -> (contextDepFeatures.toSet ++ eventDepFeatures.toSet).toSeq)
+    map.toMap
+  }
+
+  def writeAllFeaturesToFile(allFeatures:Seq[String], fileName:String="./src/main/resources/allFeaturesFile.txt"):Unit = {
+    val printWriter = new PrintWriter(new File(fileName))
+    allFeatures.map(a => if(allFeatures.indexOf(a)!= allFeatures.size-1) {
+      printWriter.write(a+",")
+    }
+    else {
+      printWriter.write(a)
+    })
   }
 
 }

@@ -9,6 +9,7 @@ import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, FoldMaker, Utils}
 import scala.io.Source
 object Main extends App {
   val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
+  Utils.writeAllFeaturesToFile(allFeatures)
   val rows2 = rows.filter(_.PMCID != "b'PMC4204162'")
   val bufferedFoldIndices = Source.fromFile("./src/main/resources/cv_folds_val_4.csv")
   val foldsFromCSV = FoldMaker.getFoldsPerPaper(bufferedFoldIndices)
