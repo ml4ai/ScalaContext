@@ -1,6 +1,5 @@
 package org.ml4ai.data.utils.correctDataPrep
 import java.io._
-
 import scala.io.Source
 object Utils {
   def argMax(values:Map[Int, Double]):Int = {
@@ -120,6 +119,43 @@ object Utils {
     val featureDict = Utils.createFeatureDictionary(numericFeatures.toSeq)
     val bestFeatureSet = featureDict("NonDep_Context")
     bestFeatureSet
+  }
+  // for every new feature, we add to a map of (featureName, (_min, _max, _sum, size))
+  def aggregateInputRowFeats(rows:Seq[String]):Map[String,(Double,Double, Double, Int)] = {
+    val resultingMap = collection.mutable.Map[String,(Double,Double, Double, Int)]()
+    for(r <- rows) {
+      if(resultingMap.contains(r)) {
+        val valueToBeAdded = 1.0
+        val currentFeatDetails = resultingMap(r)
+        val tupReplace = (Math.min(currentFeatDetails._1, valueToBeAdded),
+                        Math.max(currentFeatDetails._2, valueToBeAdded),
+                        currentFeatDetails._3 + valueToBeAdded,
+                        currentFeatDetails._4+1)
+        resultingMap(r) = tupReplace
+
+      }
+      else {
+        val entry = (r -> (1.0,1.0,1.0,1))
+        resultingMap += entry
+      }
+    }
+    resultingMap.toMap
+  }
+
+  // in the given map, key is the feature name that we will extend to name_min, name_max, name_avg
+  // value is (_min, _max, total, size) wherein we extract the following tup: (_min, _max, total/size)
+  // important part is to store them in the same order, in harmony with AggregatedRowNew
+  def finalFeatValuePairing(aggr: Map[String,(Double,Double, Double, Int)]): Seq[((String,String,String), (Double,Double,Double))] = {
+    val finalPairings = collection.mutable.ListBuffer[((String,String,String), (Double,Double,Double))]()
+    for((key,value)<- aggr){
+      val extendedKey = extendFeatureName(key)
+      val nameTup = (extendedKey._1, extendedKey._2, extendedKey._3)
+      val valueTup = (value._1, value._2, (value._3/value._4))
+      val currentTup = (nameTup, valueTup)
+      finalPairings+= currentTup
+    }
+
+    finalPairings
   }
 
 
