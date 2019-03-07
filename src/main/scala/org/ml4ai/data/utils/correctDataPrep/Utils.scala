@@ -1,5 +1,7 @@
 package org.ml4ai.data.utils.correctDataPrep
 import java.io._
+
+import scala.io.Source
 object Utils {
   def argMax(values:Map[Int, Double]):Int = {
     var bestK = Integer.MIN_VALUE
@@ -87,12 +89,39 @@ object Utils {
     })
   }
 
-  def createStats(nums: Iterable[Double]): List[Double] = {
+  def createStats(nums: Iterable[Double]): (Double, Double, Double) = {
     val min = nums.min
     val max = nums.max
     val avg = nums.sum / nums.size
-    List(min, max, avg)
+    (min, max, avg)
   }
+
+  def extendFeatureName(f:String):(String, String, String) = {
+
+      val feat_min = f+"_min"
+      val feat_max = f+"_max"
+      val feat_avg = f+"_avg"
+      (feat_min, feat_max, feat_avg)
+
+  }
+
+  def featureConstructor(file:String):(Seq[String], Seq[String]) = {
+    val allFeatures = collection.mutable.ListBuffer[String]()
+    for(l <- Source.fromFile(file).getLines) {
+      val contents = l.split(",")
+      contents.map(allFeatures+=_)
+    }
+    (allFeatures, createBestFeatureSet(allFeatures))
+  }
+
+  def createBestFeatureSet(allFeatures:Seq[String]):Seq[String] = {
+    val nonNumericFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "")
+    val numericFeatures = allFeatures.toSet -- nonNumericFeatures.toSet
+    val featureDict = Utils.createFeatureDictionary(numericFeatures.toSeq)
+    val bestFeatureSet = featureDict("NonDep_Context")
+    bestFeatureSet
+  }
+
 
 
 }
