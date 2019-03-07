@@ -87,4 +87,12 @@ object Utils {
     })
   }
 
+  def createStats(nums: Iterable[Double]): List[Double] = {
+    val min = nums.min
+    val max = nums.max
+    val avg = nums.sum / nums.size
+    List(min, max, avg)
+  }
+
+
 }
