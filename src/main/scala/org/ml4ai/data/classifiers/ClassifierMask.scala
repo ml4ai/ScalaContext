@@ -7,5 +7,5 @@ trait ClassifierMask{
 
   def predict(xTest: Seq[AggregatedRowNew]):Array[Int]
   def saveModel(fileName: String): Unit
-  def loadFrom(fileName: String):LinearSVMWrapper
+  def loadFrom(fileName: String):ClassifierMask
 }

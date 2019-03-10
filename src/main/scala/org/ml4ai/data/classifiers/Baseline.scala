@@ -18,7 +18,7 @@ case class Baseline(k:Int) extends ClassifierMask {
 
   override def saveModel(fileName: String): Unit = ()
 
-  override def loadFrom(fileName: String): LinearSVMWrapper = null
+  override def loadFrom(fileName: String): ClassifierMask = throw new NotImplementedError()
 
   def dataConverter(data:Seq[AggregatedRowNew]):Array[Array[Double]] = {
     // sentence distance is at index 18 in the row. We will extract the value at this index, create an array from it,

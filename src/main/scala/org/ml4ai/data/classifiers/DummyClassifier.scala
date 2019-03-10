@@ -8,15 +8,15 @@ object DummyClassifier extends ClassifierMask {
 
   def convertBooleansToInt(labels: Seq[Boolean]):Array[Int] = {
 
-    val toReturn = labels.map(l => l match {
+    val toReturn = labels.map {
       case true => 1
       case false => 0
-    })
+    }
     toReturn.toArray
   }
 
   def convertOptionalToBool(rows: Seq[AggregatedRowNew]): Seq[Boolean] = {
-    rows.map(x => x.label match {
+    rows.map(_.label match {
       case Some(x) => x
       case _ => false
     })
@@ -24,5 +24,5 @@ object DummyClassifier extends ClassifierMask {
 
   override def saveModel(fileName: String): Unit = ()
 
-  override def loadFrom(fileName: String): LinearSVMWrapper = null
+  override def loadFrom(fileName: String): ClassifierMask = throw new NotImplementedError()
 }
