@@ -97,9 +97,9 @@ object Utils {
 
   def extendFeatureName(f:String):(String, String, String) = {
 
-      val feat_min = f+"_min"
-      val feat_max = f+"_max"
-      val feat_avg = f+"_avg"
+      val feat_min = s"${f}_min"
+      val feat_max = s"${f}_max"
+      val feat_avg = s"${f}_avg"
       (feat_min, feat_max, feat_avg)
 
   }
