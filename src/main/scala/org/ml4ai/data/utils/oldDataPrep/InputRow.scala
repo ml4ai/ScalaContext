@@ -18,6 +18,8 @@ case class InputRow(
                      evtSentenceFirstPerson: Double,
                      evtSentencePastTense: Double,
                      evtSentencePresentTense: Double,
+                     ctxSentenceFirstPerson: Double,
+                     ctxSentencePastTense: Double,
                      dependencyDistance: Double,
 
                      sentenceDistance: Double,
