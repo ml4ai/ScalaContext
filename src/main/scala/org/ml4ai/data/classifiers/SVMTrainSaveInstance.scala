@@ -3,7 +3,7 @@ package org.ml4ai.data.classifiers
 import java.util.zip.GZIPInputStream
 
 import org.clulab.learning.LinearSVMClassifier
-import org.ml4ai.data.utils.correctDataPrep.AggregatedRowNew
+import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Utils}
 
 object SVMTrainSaveInstance extends App {
   //data preprocessing
@@ -17,7 +17,9 @@ object SVMTrainSaveInstance extends App {
   val bestFeatureSet = featureDict("NonDep_Context")
   val trainingDataPrior = rows.filter(_.PMCID != "b'PMC4204162'")
   val trainingData = extractDataByRelevantFeatures(bestFeatureSet, trainingDataPrior)
+  val (allFeat, bestFeatures) = Utils.featureConstructor("./src/main/resources/allFeaturesFile.txt")
   // call frequency counter here on trainingData
+  Utils.writeFrequenciesToFile(trainingData,  bestFeatures, "./src/main/resources/featFreq_trainSave.txt")
 
   // training the machine learning model and writing it to file
   val trainingLabels = DummyClassifier.convertOptionalToBool(trainingData)

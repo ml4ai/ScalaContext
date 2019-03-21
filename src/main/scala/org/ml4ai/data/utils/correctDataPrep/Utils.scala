@@ -158,26 +158,32 @@ object Utils {
     finalPairings
   }
 
-  def writeFrequenciesToFile(input: Seq[AggregatedRowNew], filename:String):Unit = {
+  def writeFrequenciesToFile(input: Seq[AggregatedRowNew], bestFeatureSet:Seq[String], filename:String):Unit = {
     val mut = collection.mutable.HashMap[String,Int]()
     val printWriter = new PrintWriter(new File(filename))
+    printWriter.write("Size of input: " + input.size + "\n")
     for(i <- input){
       val currentFeatureSet = i.featureGroupNames
+      //val currentFeatureValue = i.featureGroups
+      //val currentIndex = currentFeatureSet.indexOf(i)
       for(c<-currentFeatureSet) {
+        if(bestFeatureSet.contains(c)){
+        //if(bestFeatureSet.contains(c) && currentFeatureValue(currentIndex)!=0.0) {
         if(mut.contains(c)){
           val freq = mut(c)+1
           mut += (c -> freq)
         }
-        else mut+=(c->1)
-      }
+        else mut+=(c->1)}}
+      //}
 
-    }
+
+
 
     for((k,v)<- mut.toMap) {
-      val string = k + " : " + v
+      val string = k + " : " + v + "\n"
       printWriter.write(string)
     }
-  }
+  }}
 
 
 
