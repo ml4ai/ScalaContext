@@ -158,6 +158,27 @@ object Utils {
     finalPairings
   }
 
+  def writeFrequenciesToFile(input: Seq[AggregatedRowNew], filename:String):Unit = {
+    val mut = collection.mutable.HashMap[String,Int]()
+    val printWriter = new PrintWriter(new File(filename))
+    for(i <- input){
+      val currentFeatureSet = i.featureGroupNames
+      for(c<-currentFeatureSet) {
+        if(mut.contains(c)){
+          val freq = mut(c)+1
+          mut += (c -> freq)
+        }
+        else mut+=(c->1)
+      }
+
+    }
+
+    for((k,v)<- mut.toMap) {
+      val string = k + " : " + v
+      printWriter.write(string)
+    }
+  }
+
 
 
 }

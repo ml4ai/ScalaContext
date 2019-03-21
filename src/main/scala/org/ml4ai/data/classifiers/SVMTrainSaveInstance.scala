@@ -17,6 +17,7 @@ object SVMTrainSaveInstance extends App {
   val bestFeatureSet = featureDict("NonDep_Context")
   val trainingDataPrior = rows.filter(_.PMCID != "b'PMC4204162'")
   val trainingData = extractDataByRelevantFeatures(bestFeatureSet, trainingDataPrior)
+  // call frequency counter here on trainingData
 
   // training the machine learning model and writing it to file
   val trainingLabels = DummyClassifier.convertOptionalToBool(trainingData)
