@@ -11,11 +11,11 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
   def fit(xTrain: RVFDataset[Int, String]):Unit = classifier.train(xTrain)
 
   override def predict(data: Seq[AggregatedRowNew]): Array[Int] = {
-    /*logger.info("Inside predict function, examining input")
+    logger.info("Inside predict function, examining input")
     logger.info("the following are the names of features found in the current input")
-    data(0).featureGroupNames.map(logger.info(_))*/
+    data(0).featureGroupNames.map(logger.info(_))
     val (_, individualRows) = dataConverter(data)
-    //logger.info(individualRows(0) + " : is the result from dataconverter function")
+    logger.info(individualRows(0) + " : is the result from dataconverter function")
     individualRows.map(classifier.classOf(_))}
 
   def predict(testDatum:RVFDatum[Int, String]):Int = {
