@@ -161,13 +161,10 @@ object Utils extends LazyLogging {
     finalPairings
   }
 
-  def writeFrequenciesToFile(input: Seq[AggregatedRowNew], bestFeatureSet:Seq[String], filename:String):Unit = {
-    logger.info("inside frequency count function")
+  def writeFrequenciesToFile(input: Seq[AggregatedRowNew], bestFeatureSet:Seq[String], filename:String):Map[String,Int]= {
     val mut = collection.mutable.HashMap[String,Int]()
     val printWriter = new PrintWriter(new File(filename))
-    logger.info("Size of input: " + input.size + "\n")
     for(i <- input){
-      logger.info("inside for loop for input")
       val currentFeatureSet = i.featureGroupNames
       //val currentFeatureValue = i.featureGroups
       //val currentIndex = currentFeatureSet.indexOf(i)
@@ -190,7 +187,9 @@ object Utils extends LazyLogging {
       logger.info(string)
       printWriter.write(string)
     }
-  }}
+  }
+    mut.toMap
+  }
 
 
 
