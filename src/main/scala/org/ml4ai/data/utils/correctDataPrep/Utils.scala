@@ -165,8 +165,7 @@ object Utils extends LazyLogging {
     logger.info("inside frequency count function")
     val mut = collection.mutable.HashMap[String,Int]()
     val printWriter = new PrintWriter(new File(filename))
-    printWriter.write("Size of input: " + input.size + "\n")
-    logger.info((input.size).toString + " : size of input seq of aggregated rows")
+    logger.info("Size of input: " + input.size + "\n")
     for(i <- input){
       logger.info("inside for loop for input")
       val currentFeatureSet = i.featureGroupNames
