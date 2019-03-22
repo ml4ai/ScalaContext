@@ -1,7 +1,10 @@
 package org.ml4ai.data.utils.correctDataPrep
 import java.io._
+
+import com.typesafe.scalalogging.LazyLogging
+
 import scala.io.Source
-object Utils {
+object Utils extends LazyLogging {
   def argMax(values:Map[Int, Double]):Int = {
     var bestK = Integer.MIN_VALUE
     var bestF1 = Double.MinValue
@@ -159,6 +162,7 @@ object Utils {
   }
 
   def writeFrequenciesToFile(input: Seq[AggregatedRowNew], bestFeatureSet:Seq[String], filename:String):Unit = {
+    logger.info("inside frequency count function")
     val mut = collection.mutable.HashMap[String,Int]()
     val printWriter = new PrintWriter(new File(filename))
     printWriter.write("Size of input: " + input.size + "\n")
@@ -181,6 +185,8 @@ object Utils {
 
     for((k,v)<- mut.toMap) {
       val string = k + " : " + v + "\n"
+      logger.info("Checking string to write")
+      logger.info(string)
       printWriter.write(string)
     }
   }}
