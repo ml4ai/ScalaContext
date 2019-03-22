@@ -1,17 +1,21 @@
 package org.ml4ai.data.classifiers
 import java.io._
 
+import com.typesafe.scalalogging.LazyLogging
 import org.clulab.struct.Counter
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Utils}
 import org.clulab.learning._
-case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends ClassifierMask {
+case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends ClassifierMask with LazyLogging {
   override def fit(xTrain: Seq[AggregatedRowNew]): Unit = ()
 
   def fit(xTrain: RVFDataset[Int, String]):Unit = classifier.train(xTrain)
 
   override def predict(data: Seq[AggregatedRowNew]): Array[Int] = {
+    logger.info("Inside predict function, examining input")
+    logger.info("the following are the names of features found in the current input")
+    data(0).featureGroupNames.map(logger.info(_))
     val (_, individualRows) = dataConverter(data)
-
+    logger.info(individualRows(0) + " : is the result from dataconverter function")
     individualRows.map(classifier.classOf(_))}
 
   def predict(testDatum:RVFDatum[Int, String]):Int = {
