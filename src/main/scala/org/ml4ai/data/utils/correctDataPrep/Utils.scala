@@ -166,7 +166,9 @@ object Utils extends LazyLogging {
     val mut = collection.mutable.HashMap[String,Int]()
     val printWriter = new PrintWriter(new File(filename))
     printWriter.write("Size of input: " + input.size + "\n")
+    logger.info((input.size).toString)
     for(i <- input){
+      logger.info("inside for loop for input")
       val currentFeatureSet = i.featureGroupNames
       //val currentFeatureValue = i.featureGroups
       //val currentIndex = currentFeatureSet.indexOf(i)
