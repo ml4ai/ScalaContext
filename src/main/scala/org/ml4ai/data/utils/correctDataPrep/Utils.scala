@@ -81,7 +81,6 @@ object Utils extends LazyLogging {
   }
 
   def createStats(nums: Iterable[Double]): (Double, Double, Double) = {
-    println(s"${nums.size} : size of input feature value")
     val min = nums.min
     val max = nums.max
     val avg = nums.sum / nums.size
