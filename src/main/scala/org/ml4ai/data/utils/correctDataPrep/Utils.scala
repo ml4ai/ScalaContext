@@ -179,6 +179,9 @@ object Utils extends LazyLogging {
         }
       }
     }
+    for((k,v) <- mut.toMap) {
+      println(s"The frequency of ${k} is ${v}")
+    }
     mut.toMap
   }
 
