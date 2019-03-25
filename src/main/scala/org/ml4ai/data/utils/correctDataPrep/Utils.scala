@@ -162,7 +162,7 @@ object Utils extends LazyLogging {
     finalPairings
   }
 
-  def featFreqMap(input: Seq[AggregatedRowNew], bestFeatureSet:Seq[String], filename:String):Map[String,Int]= {
+  def featFreqMap(input: Seq[AggregatedRowNew], bestFeatureSet:Seq[String]):Map[String,Int]= {
     val mut = collection.mutable.HashMap[String,Int]()
     println("Inside feature count function")
     println(s"${input.size} : is the size of the input Seq[AggregatedRowNew]")

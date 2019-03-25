@@ -20,7 +20,7 @@ object SVMTrainSaveInstance extends App {
   val trainingData = extractDataByRelevantFeatures(bestFeatureSet, trainingDataPrior)
   val (allFeat, bestFeatures) = Utils.featureConstructor("./src/main/resources/allFeaturesFile.txt")
   // call frequency counter here on trainingData
-  //val map = Utils.writeFrequenciesToFile(trainingData,  bestFeatures, "./src/main/resources/featFreq_trainSave.txt")
+  val map = Utils.featFreqMap(trainingData,  bestFeatures("All_features"))
 
   // saving untrained model to file
   svmInstance.saveModel(untrainedModelFile)
