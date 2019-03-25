@@ -13,7 +13,6 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
   override def predict(data: Seq[AggregatedRowNew]): Array[Int] = {
     println("inside predict function")
     val (_, individualRows) = dataConverter(data)
-    println(individualRows(0) + " : is the result from dataconverter function")
     individualRows.map(classifier.classOf(_))}
 
   def predict(testDatum:RVFDatum[Int, String]):Int = {
