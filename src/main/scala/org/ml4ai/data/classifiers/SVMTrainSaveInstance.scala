@@ -8,6 +8,7 @@ import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Utils}
 object SVMTrainSaveInstance extends App {
   //data preprocessing
   val fileName = "./src/main/resources/svmTrainedModel.dat"
+  val untrainedModelFile = "./src/main/resources/svmUntrainedModel.dat"
   val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
   val svmInstance = new LinearSVMWrapper(SVMClassifier)
   val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
@@ -19,7 +20,11 @@ object SVMTrainSaveInstance extends App {
   val trainingData = extractDataByRelevantFeatures(bestFeatureSet, trainingDataPrior)
   val (allFeat, bestFeatures) = Utils.featureConstructor("./src/main/resources/allFeaturesFile.txt")
   // call frequency counter here on trainingData
-  val map = Utils.writeFrequenciesToFile(trainingData,  bestFeatures, "./src/main/resources/featFreq_trainSave.txt")
+  //val map = Utils.writeFrequenciesToFile(trainingData,  bestFeatures, "./src/main/resources/featFreq_trainSave.txt")
+
+  // saving untrained model to file
+  svmInstance.saveModel(untrainedModelFile)
+
 
   // training the machine learning model and writing it to file
   val trainingLabels = DummyClassifier.convertOptionalToBool(trainingData)
