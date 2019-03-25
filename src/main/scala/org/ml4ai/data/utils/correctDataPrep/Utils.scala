@@ -175,7 +175,7 @@ object Utils extends LazyLogging {
             val freq = mut(c)+1
             mut += (c -> freq)
           }
-        else mut+=(c->1)
+          else mut+=(c->1)
         }
       }
     }
