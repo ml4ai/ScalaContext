@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import scala.collection.mutable
 import scala.io.Source
-
+import scala.io.BufferedSource
 case class AggregatedRowNew(
                              sentenceIndex:Int,
                              PMCID:String,
@@ -66,8 +66,10 @@ object AggregatedRowNew {
     AggregatedRowNew(sentencePos, pmcid, evt, ctx, Some(label.toBoolean), featureGroups.toArray, featureNames.toArray)
   }
 
-  def fromStream(stream:InputStream):(Seq[String], Seq[AggregatedRowNew]) = {
-    val source = Source.fromInputStream(stream)
+  def fromStream(stream:InputStream, bufSource: Option[BufferedSource] = None):(Seq[String], Seq[AggregatedRowNew]) = {
+    val source = bufSource match {
+      case None => Source.fromInputStream(stream)
+      case Some(buf) => buf}
     val lines = source.getLines()
     val headers = lines.next() split ","
     val rectifiedHeaders = rectifyWrongFeatures(headers)
