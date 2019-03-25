@@ -68,18 +68,7 @@ object Utils extends LazyLogging {
     trainValCombined.toArray
   }
 
-  def createFeatureDictionary(numericFeatures: Seq[String]):Map[String, Seq[String]] = {
-    val contextDepFeatures = numericFeatures.filter(_.startsWith("ctxDepTail"))
-    val eventDepFeatures = numericFeatures.filter(_.startsWith("evtDepTail"))
-    val nonDepFeatures = numericFeatures.toSet -- (contextDepFeatures.toSet ++ eventDepFeatures.toSet)
-    val map = collection.mutable.Map[String, Seq[String]]()
-    map += ("All_features" -> numericFeatures)
-    map += ("Non_Dependency_Features" -> nonDepFeatures.toSeq)
-    map += ("NonDep_Context" -> (nonDepFeatures ++ contextDepFeatures.toSet).toSeq)
-    map += ("NonDep_Event" -> (nonDepFeatures ++ eventDepFeatures.toSet).toSeq)
-    map += ("Context_Event" -> (contextDepFeatures.toSet ++ eventDepFeatures.toSet).toSeq)
-    map.toMap
-  }
+
 
   def writeAllFeaturesToFile(allFeatures:Seq[String], fileName:String="./src/main/resources/allFeaturesFile.txt"):Unit = {
     val printWriter = new PrintWriter(new File(fileName))
@@ -107,7 +96,7 @@ object Utils extends LazyLogging {
 
   }
 
-  def featureConstructor(file:String):(Seq[String], Seq[String]) = {
+  def featureConstructor(file:String):(Seq[String], Map[String, Seq[String]]) = {
     val allFeatures = collection.mutable.ListBuffer[String]()
     for(l <- Source.fromFile(file).getLines) {
       val contents = l.split(",")
@@ -116,12 +105,24 @@ object Utils extends LazyLogging {
     (allFeatures, createBestFeatureSet(allFeatures))
   }
 
-  def createBestFeatureSet(allFeatures:Seq[String]):Seq[String] = {
+  def createBestFeatureSet(allFeatures:Seq[String]):Map[String, Seq[String]] = {
     val nonNumericFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "")
     val numericFeatures = allFeatures.toSet -- nonNumericFeatures.toSet
     val featureDict = Utils.createFeatureDictionary(numericFeatures.toSeq)
-    val bestFeatureSet = featureDict("NonDep_Context")
-    bestFeatureSet
+    featureDict
+  }
+
+  def createFeatureDictionary(numericFeatures: Seq[String]):Map[String, Seq[String]] = {
+    val contextDepFeatures = numericFeatures.filter(_.startsWith("ctxDepTail"))
+    val eventDepFeatures = numericFeatures.filter(_.startsWith("evtDepTail"))
+    val nonDepFeatures = numericFeatures.toSet -- (contextDepFeatures.toSet ++ eventDepFeatures.toSet)
+    val map = collection.mutable.Map[String, Seq[String]]()
+    map += ("All_features" -> numericFeatures)
+    map += ("Non_Dependency_Features" -> nonDepFeatures.toSeq)
+    map += ("NonDep_Context" -> (nonDepFeatures ++ contextDepFeatures.toSet).toSeq)
+    map += ("NonDep_Event" -> (nonDepFeatures ++ eventDepFeatures.toSet).toSeq)
+    map += ("Context_Event" -> (contextDepFeatures.toSet ++ eventDepFeatures.toSet).toSeq)
+    map.toMap
   }
   // for every new feature, we add to a map of (featureName, (_min, _max, _sum, size))
   def aggregateInputRowFeats(rows:Seq[String]):Map[String,(Double,Double, Double, Int)] = {
@@ -161,33 +162,23 @@ object Utils extends LazyLogging {
     finalPairings
   }
 
-  def writeFrequenciesToFile(input: Seq[AggregatedRowNew], bestFeatureSet:Seq[String], filename:String):Map[String,Int]= {
+  def featFreqMap(input: Seq[AggregatedRowNew], bestFeatureSet:Seq[String], filename:String):Map[String,Int]= {
     val mut = collection.mutable.HashMap[String,Int]()
-    val printWriter = new PrintWriter(new File(filename))
+    println("Inside feature count function")
+    println(s"${input.size} : is the size of the input Seq[AggregatedRowNew]")
     for(i <- input){
       val currentFeatureSet = i.featureGroupNames
-      //val currentFeatureValue = i.featureGroups
-      //val currentIndex = currentFeatureSet.indexOf(i)
+      println(s"The current AggregatedRow has ${currentFeatureSet.size} features")
       for(c<-currentFeatureSet) {
         if(bestFeatureSet.contains(c)){
-        //if(bestFeatureSet.contains(c) && currentFeatureValue(currentIndex)!=0.0) {
-        if(mut.contains(c)){
-          val freq = mut(c)+1
-          mut += (c -> freq)
+          if(mut.contains(c)){
+            val freq = mut(c)+1
+            mut += (c -> freq)
+          }
+        else mut+=(c->1)
         }
-        else mut+=(c->1)}}
-      //}
-
-
-
-
-    for((k,v)<- mut.toMap) {
-      val string = k + " : " + v + "\n"
-      logger.info("Checking string to write")
-      logger.info(string)
-      printWriter.write(string)
+      }
     }
-  }
     mut.toMap
   }
 
