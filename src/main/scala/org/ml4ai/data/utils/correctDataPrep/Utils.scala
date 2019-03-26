@@ -164,11 +164,8 @@ object Utils extends LazyLogging {
 
   def featFreqMap(input: Seq[AggregatedRowNew], bestFeatureSet:Seq[String]):Map[String,Int]= {
     val mut = collection.mutable.HashMap[String,Int]()
-    println("Inside feature count function")
-    println(s"${input.size} : is the size of the input Seq[AggregatedRowNew]")
     for(i <- input){
       val currentFeatureSet = i.featureGroupNames
-      println(s"The current AggregatedRow has ${currentFeatureSet.size} features")
       for(c<-currentFeatureSet) {
         if(bestFeatureSet.contains(c)){
           if(mut.contains(c)){
@@ -179,10 +176,29 @@ object Utils extends LazyLogging {
         }
       }
     }
-    for((k,v) <- mut.toMap) {
-      println(s"The frequency of ${k} is ${v}")
-    }
     mut.toMap
+  }
+
+  def writeFeatFreqToFile(map: Map[String,Int], fileName:String): Unit = {
+    val pw = new PrintWriter(new File(fileName))
+    for((k,v) <- map.toSeq) {
+      val str = s"The Frequency of ${k} is ${v} \n"
+      pw.write(str)
+    }
+  }
+
+  def writeFeatValsToFile(input:Seq[AggregatedRowNew], fileName:String):Unit = {
+    val pw = new PrintWriter(new File(fileName))
+    for(i <- input){
+      val currentFeatureSet = i.featureGroupNames
+      val currentFeaturesValue = i.featureGroups
+      val pairs = currentFeatureSet zip currentFeaturesValue
+      for((name,value) <- pairs) {
+        val str = s"${name} : ${value} \n"
+        pw.write(str)
+      }
+    }
+
   }
 
 
