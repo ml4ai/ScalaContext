@@ -1,8 +1,11 @@
 package org.ml4ai.data.utils.correctDataPrep
 import java.io._
 
+import scala.collection.mutable.StringBuilder
 import com.typesafe.scalalogging.LazyLogging
+import org.ml4ai.data.utils.correctDataPrep.AggregatedRowNew.{allOtherFeatures, indices, rectifyWrongFeatures}
 
+import scala.collection.mutable
 import scala.io.Source
 object Utils extends LazyLogging {
   def argMax(values:Map[Int, Double]):Int = {
@@ -71,13 +74,18 @@ object Utils extends LazyLogging {
 
 
   def writeAllFeaturesToFile(allFeatures:Seq[String], fileName:String="./src/main/resources/allFeaturesFile.txt"):Unit = {
-    val printWriter = new PrintWriter(new File(fileName))
-    allFeatures.map(a => if(allFeatures.indexOf(a)!= allFeatures.size-1) {
-      printWriter.write(a+",")
+    val os = new ObjectOutputStream(new FileOutputStream(fileName))
+    val str = new mutable.StringBuilder()
+    for(i<- 0 until allFeatures.size - 1) {
+      val current = allFeatures(i)
+      str.append(current+",")
     }
-    else {
-      printWriter.write(a)
-    })
+    str.append(allFeatures(allFeatures.size - 1))
+    val stringEquiv = str.toString()
+    val arr = stringEquiv.split(",")
+    println(arr.size + " : checking if split after append is correct")
+    os.writeObject(arr)
+    os.close()
   }
 
   def createStats(nums: Iterable[Double]): (Double, Double, Double) = {
@@ -97,12 +105,24 @@ object Utils extends LazyLogging {
   }
 
   def featureConstructor(file:String):(Seq[String], Map[String, Seq[String]]) = {
-    val allFeatures = collection.mutable.ListBuffer[String]()
-    for(l <- Source.fromFile(file).getLines) {
-      val contents = l.split(",")
-      contents.map(allFeatures+=_)
-    }
-    (allFeatures, createBestFeatureSet(allFeatures))
+//    val fileInputStream = new FileInputStream(file)
+//    val sourceW = fileInputStream.asInstanceOf[InputStream]
+//    val source = Source.fromInputStream(sourceW)
+//    val lines = source.getLines()
+//    val headers = lines.next() split ","
+    val is = new ObjectInputStream(new FileInputStream(file))
+    val headers = is.readObject().asInstanceOf[Array[String]]
+    println(headers.size + " : size of array after splitting")
+    val rectifiedHeaders = rectifyWrongFeatures(headers)
+    //source.close()
+    is.close()
+    (rectifiedHeaders, createBestFeatureSet(rectifiedHeaders))
+  }
+
+ private def rectifyWrongFeatures(headers:Seq[String]): Seq[String] = {
+    val result = collection.mutable.ListBuffer[String]()
+    headers.map(h => if(headers.indexOf(h) == 1) result += "PMCID" else result += h)
+    result
   }
 
   def createBestFeatureSet(allFeatures:Seq[String]):Map[String, Seq[String]] = {

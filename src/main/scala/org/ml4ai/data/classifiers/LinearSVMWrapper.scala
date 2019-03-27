@@ -11,7 +11,6 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
   def fit(xTrain: RVFDataset[Int, String]):Unit = classifier.train(xTrain)
 
   override def predict(data: Seq[AggregatedRowNew]): Array[Int] = {
-    println("inside predict function")
     val (_, individualRows) = dataConverter(data)
     individualRows.map(classifier.classOf(_))}
 

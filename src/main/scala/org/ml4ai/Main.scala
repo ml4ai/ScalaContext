@@ -10,6 +10,10 @@ import scala.io.Source
 object Main extends App {
   val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
   Utils.writeAllFeaturesToFile(allFeatures)
+  val (allFeats, bestFeatDict) = Utils.featureConstructor("./src/main/resources/allFeaturesFile.txt")
+  var truth = true
+  truth = allFeats.foldLeft(truth)(_ && allFeatures.contains(_))
+  println(truth + " to check if all features in file read are contained in all features from row creation")
   val rows2 = rows.filter(_.PMCID != "b'PMC4204162'")
   val bufferedFoldIndices = Source.fromFile("./src/main/resources/cv_folds_val_4.csv")
   val foldsFromCSV = FoldMaker.getFoldsPerPaper(bufferedFoldIndices)
