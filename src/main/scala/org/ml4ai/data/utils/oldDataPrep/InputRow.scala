@@ -20,6 +20,7 @@ case class InputRow(
                      evtSentencePresentTense: Double,
                      ctxSentenceFirstPerson: Double,
                      ctxSentencePastTense: Double,
+                     ctxSentencePresentTense: Double,
                      dependencyDistance: Double,
 
                      sentenceDistance: Double,
@@ -30,7 +31,7 @@ case class InputRow(
 object InputRow{
 
   private val listOfSpecificFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "closesCtxOfClass", "context_frequency",
-    "evtNegationInTail", "evtSentenceFirstPerson", "evtSentencePastTense", "evtSentencePresentTense","ctxSentenceFirstPerson","ctxSentencePastTense", "sentenceDistance", "dependencyDistance")
+    "evtNegationInTail", "evtSentenceFirstPerson", "evtSentencePastTense", "evtSentencePresentTense","ctxSentenceFirstPerson","ctxSentencePastTense", "ctxSentencePresentTense","sentenceDistance", "dependencyDistance")
 
   private def allOtherFeatures(headers:Seq[String]): Set[String] = headers.toSet -- (listOfSpecificFeatures ++ Seq(""))
 
@@ -69,6 +70,7 @@ object InputRow{
     val evtSentencePresentTense = rowData(indices("evtSentencePresentTense"))
     val ctxSentenceFirstPerson = rowData(indices("ctxSentenceFirstPerson"))
     val ctxSentencePastTense = rowData(indices("ctxSentencePastTense"))
+    val ctxSentencePresentTense = rowData(indices("ctxSentencePresentTense"))
     InputRow(sentencePos,
       pmcid,
       Some(label.toBoolean),
@@ -82,6 +84,7 @@ object InputRow{
       evtSentencePresentTense.toDouble,
       ctxSentenceFirstPerson.toDouble,
       ctxSentencePastTense.toDouble,
+      ctxSentencePresentTense.toDouble,
       dependencyDistance.toDouble,
       sentenceDist.toDouble,
       ctx_dependencyTails.toSet,

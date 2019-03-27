@@ -114,7 +114,6 @@ object Utils extends LazyLogging {
 //    val headers = lines.next() split ","
     val is = new ObjectInputStream(new FileInputStream(file))
     val headers = is.readObject().asInstanceOf[Array[String]]
-    println(headers.size + " : size of array after splitting")
     val rectifiedHeaders = rectifyWrongFeatures(headers)
     //source.close()
     is.close()
