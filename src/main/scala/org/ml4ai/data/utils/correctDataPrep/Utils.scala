@@ -74,6 +74,7 @@ object Utils extends LazyLogging {
 
 
   def writeAllFeaturesToFile(allFeatures:Seq[String], fileName:String="./src/main/resources/allFeaturesFile.txt"):Unit = {
+    //val fos = new FileOutputStream(fileName)
     val os = new ObjectOutputStream(new FileOutputStream(fileName))
     val str = new mutable.StringBuilder()
     for(i<- 0 until allFeatures.size - 1) {
@@ -83,6 +84,7 @@ object Utils extends LazyLogging {
     str.append(allFeatures.last)
     val stringEquiv = str.toString()
     val arr = stringEquiv.split(",")
+    //val byteArr = arr.map(_.toByte)
     println(arr.size + " : checking if split after append is correct")
     os.writeObject(arr.asInstanceOf[Array[String]])
     os.close()
