@@ -21,8 +21,8 @@ case class InputRow(
                      ctxSentenceFirstPerson: Double,
                      ctxSentencePastTense: Double,
                      ctxSentencePresentTense: Double,
+                     ctxNegationIntTail: Double,
                      dependencyDistance: Double,
-
                      sentenceDistance: Double,
                      ctx_dependencyTails:Set[String],
                      evt_dependencyTails:Set[String]
@@ -71,6 +71,7 @@ object InputRow{
     val ctxSentenceFirstPerson = rowData(indices("ctxSentenceFirstPerson"))
     val ctxSentencePastTense = rowData(indices("ctxSentencePastTense"))
     val ctxSentencePresentTense = rowData(indices("ctxSentencePresentTense"))
+    val ctxNegationIntTail = rowData(indices("ctxNegationIntTail"))
     InputRow(sentencePos,
       pmcid,
       Some(label.toBoolean),
@@ -85,6 +86,7 @@ object InputRow{
       ctxSentenceFirstPerson.toDouble,
       ctxSentencePastTense.toDouble,
       ctxSentencePresentTense.toDouble,
+      ctxNegationIntTail.toDouble,
       dependencyDistance.toDouble,
       sentenceDist.toDouble,
       ctx_dependencyTails.toSet,
