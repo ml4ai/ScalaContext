@@ -80,11 +80,11 @@ object Utils extends LazyLogging {
       val current = allFeatures(i)
       str.append(current+",")
     }
-    str.append(allFeatures(allFeatures.size - 1))
+    str.append(allFeatures.last)
     val stringEquiv = str.toString()
     val arr = stringEquiv.split(",")
     println(arr.size + " : checking if split after append is correct")
-    os.writeObject(arr)
+    os.writeObject(arr.asInstanceOf[Array[String]])
     os.close()
   }
 
