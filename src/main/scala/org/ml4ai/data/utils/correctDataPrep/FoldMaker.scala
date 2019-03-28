@@ -3,6 +3,7 @@ package org.ml4ai.data.utils.correctDataPrep
 import org.ml4ai.data.classifiers.{Baseline, LinearSVMWrapper}
 import scala.collection.mutable
 import scala.io.BufferedSource
+
 case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRowNew]) extends Iterable[(Array[Int], Array[Int], Array[Int])]{
   def toFolds:Iterable[(Array[Int], Array[Int], Array[Int])] = new mutable.HashSet[(Array[Int], Array[Int], Array[Int])]()
   override def iterator:Iterator[(Array[Int], Array[Int], Array[Int])] = this.toFolds.iterator

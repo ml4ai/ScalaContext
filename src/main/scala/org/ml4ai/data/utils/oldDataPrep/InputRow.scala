@@ -30,6 +30,7 @@ case class InputRow(
 
 object InputRow{
 
+  // TODO Shradha: Put this in a config file
   private val listOfSpecificFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "closesCtxOfClass", "context_frequency",
     "evtNegationInTail", "evtSentenceFirstPerson", "evtSentencePastTense", "evtSentencePresentTense","ctxSentenceFirstPerson","ctxSentencePastTense", "ctxSentencePresentTense","sentenceDistance", "dependencyDistance")
 

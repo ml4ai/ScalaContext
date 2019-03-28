@@ -2,11 +2,13 @@ package org.ml4ai
 
 import java.util.zip._
 
-import org.clulab.learning.{LinearSVMClassifier}
+import org.clulab.learning.LinearSVMClassifier
 import org.ml4ai.data.classifiers.LinearSVMWrapper
 import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, FoldMaker, Utils}
 
 import scala.io.Source
+
+// TODO Shraddha: Rename the class to a more informative name
 object Main extends App {
   val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
   Utils.writeAllFeaturesToFile(allFeatures)

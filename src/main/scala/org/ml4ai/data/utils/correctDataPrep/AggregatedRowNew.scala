@@ -5,6 +5,8 @@ import java.io.InputStream
 import scala.collection.mutable
 import scala.io.Source
 import scala.io.BufferedSource
+
+// TODO Shraddha: Rename the class and package to keep just a single version, and avoid old vs correct
 case class AggregatedRowNew(
                              sentenceIndex:Int,
                              PMCID:String,
@@ -14,7 +16,9 @@ case class AggregatedRowNew(
                              featureGroups: Array[Double],
                              featureGroupNames:Array[String])
 
+
 object AggregatedRowNew {
+  // TODO Shraddha: Put this in a config file
   private val listOfSpecificFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "closesCtxOfClass_min", "closesCtxOfClass_max", "closesCtxOfClass_avg", "context_frequency_min","context_frequency_max", "context_frequency_avg",
     "evtNegationInTail_min","evtNegationInTail_max","evtNegationInTail_avg", "ctxNegationIntTail_min","ctxNegationIntTail_max","ctxNegationIntTail_avg","evtSentenceFirstPerson_min","evtSentenceFirstPerson_max","evtSentenceFirstPerson_avg", "evtSentencePastTense_min","evtSentencePastTense_max","evtSentencePastTense_avg", "evtSentencePresentTense_min","evtSentencePresentTense_max","evtSentencePresentTense_avg", "ctxSentencePresentTense_min","ctxSentencePresentTense_max","ctxSentencePresentTense_avg", "sentenceDistance_min","sentenceDistance_max","sentenceDistance_avg", "dependencyDistance_min", "dependencyDistance_max", "dependencyDistance_avg")
 
