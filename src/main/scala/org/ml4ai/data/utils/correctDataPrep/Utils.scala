@@ -107,6 +107,7 @@ object Utils extends LazyLogging {
     headers
   }
 
+  // TODO Shradha: Remove the default value and load the path from the config file
   def writeAllFeaturesToFile(allFeatures:Seq[String], fileName:String="./src/main/resources/allFeaturesFile.txt"):Unit = {
     //val fos = new FileOutputStream(fileName)
     val os = new ObjectOutputStream(new FileOutputStream(fileName))
