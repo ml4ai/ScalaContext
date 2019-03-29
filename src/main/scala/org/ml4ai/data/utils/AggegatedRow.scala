@@ -1,4 +1,4 @@
-package org.ml4ai.data.utils.correctDataPrep
+package org.ml4ai.data.utils
 
 import java.io.InputStream
 
@@ -6,8 +6,7 @@ import scala.collection.mutable
 import scala.io.Source
 import scala.io.BufferedSource
 
-// TODO Shraddha: Rename the class and package to keep just a single version, and avoid old vs correct
-case class AggregatedRowNew(
+case class AggegatedRow(
                              sentenceIndex:Int,
                              PMCID:String,
                              EvtID: String,
@@ -17,14 +16,14 @@ case class AggregatedRowNew(
                              featureGroupNames:Array[String])
 
 
-object AggregatedRowNew {
+object AggegatedRow {
   // TODO Shraddha: Put this in a config file
   private val listOfSpecificFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "closesCtxOfClass_min", "closesCtxOfClass_max", "closesCtxOfClass_avg", "context_frequency_min","context_frequency_max", "context_frequency_avg",
     "evtNegationInTail_min","evtNegationInTail_max","evtNegationInTail_avg", "ctxNegationIntTail_min","ctxNegationIntTail_max","ctxNegationIntTail_avg","evtSentenceFirstPerson_min","evtSentenceFirstPerson_max","evtSentenceFirstPerson_avg", "evtSentencePastTense_min","evtSentencePastTense_max","evtSentencePastTense_avg", "evtSentencePresentTense_min","evtSentencePresentTense_max","evtSentencePresentTense_avg", "ctxSentencePresentTense_min","ctxSentencePresentTense_max","ctxSentencePresentTense_avg", "ctxSentencePastTense_max","ctxSentencePastTense_min", "ctxSentencePastTense_avg","ctxSentenceFirstPerson_min","ctxSentenceFirstPerson_min","ctxSentenceFirstPerson_min","sentenceDistance_min","sentenceDistance_max","sentenceDistance_avg", "dependencyDistance_min", "dependencyDistance_max", "dependencyDistance_avg")
 
   private def allOtherFeatures(headers:Seq[String]): Set[String] = headers.toSet -- (listOfSpecificFeatures ++ Seq(""))
   private def indices(headers:Seq[String]): Map[String, Int] = headers.zipWithIndex.toMap
-  def apply(str:String, headers: Seq[String], allOtherFeatures:Set[String], indices:Map[String, Int]):AggregatedRowNew = {
+  def apply(str:String, headers: Seq[String], allOtherFeatures:Set[String], indices:Map[String, Int]):AggegatedRow = {
     val rowData = str.split(",")
     val sentencePos = rowData(0).toInt
     var evt_dependencyTails = new mutable.ListBuffer[Double]
@@ -67,10 +66,10 @@ object AggregatedRowNew {
     featureGroups ++= ctx_dependencyTails
     featureNames ++= evt_dependencyFeatures
     featureNames ++= ctx_dependencyFeatures
-    AggregatedRowNew(sentencePos, pmcid, evt, ctx, Some(label.toBoolean), featureGroups.toArray, featureNames.toArray)
+    AggegatedRow(sentencePos, pmcid, evt, ctx, Some(label.toBoolean), featureGroups.toArray, featureNames.toArray)
   }
 
-  def fromStream(stream:InputStream, bufSource: Option[BufferedSource] = None):(Seq[String], Seq[AggregatedRowNew]) = {
+  def fromStream(stream:InputStream, bufSource: Option[BufferedSource] = None):(Seq[String], Seq[AggegatedRow]) = {
     val source = bufSource match {
       case None => Source.fromInputStream(stream)
       case Some(buf) => buf}
@@ -79,7 +78,7 @@ object AggregatedRowNew {
     val rectifiedHeaders = rectifyWrongFeatures(headers)
     val features = allOtherFeatures(rectifiedHeaders)
     val ixs = indices(rectifiedHeaders)
-    val ret = lines.map(l => AggregatedRowNew(l, rectifiedHeaders, features, ixs)).toList
+    val ret = lines.map(l => AggegatedRow(l, rectifiedHeaders, features, ixs)).toList
     source.close()
     (rectifiedHeaders, ret)
   }

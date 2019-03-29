@@ -1,10 +1,10 @@
-package org.ml4ai.data.utils.correctDataPrep
+package org.ml4ai.data.utils
 
 import org.ml4ai.data.classifiers.{Baseline, LinearSVMWrapper}
 import scala.collection.mutable
 import scala.io.BufferedSource
 
-case class FoldMaker(groupedFeatures: Map[(String, String, String), AggregatedRowNew]) extends Iterable[(Array[Int], Array[Int], Array[Int])]{
+case class FoldMaker(groupedFeatures: Map[(String, String, String), AggegatedRow]) extends Iterable[(Array[Int], Array[Int], Array[Int])]{
   def toFolds:Iterable[(Array[Int], Array[Int], Array[Int])] = new mutable.HashSet[(Array[Int], Array[Int], Array[Int])]()
   override def iterator:Iterator[(Array[Int], Array[Int], Array[Int])] = this.toFolds.iterator
 }
@@ -33,7 +33,7 @@ object FoldMaker {
     toReturn.toArray
   }
 
-  def baselineController(foldsFromCSV: Array[(Array[Int], Array[Int], Array[Int])], rows2: Seq[AggregatedRowNew]): (Array[Int], Array[Int]) = {
+  def baselineController(foldsFromCSV: Array[(Array[Int], Array[Int], Array[Int])], rows2: Seq[AggegatedRow]): (Array[Int], Array[Int]) = {
     val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
     val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
     for((train,_,test) <- foldsFromCSV) {
@@ -61,7 +61,7 @@ object FoldMaker {
     (giantTruthTestLabel.toArray, giantPredTestLabel.toArray)
   }
 
-  def svmControllerLinearSVM(svmInstance: LinearSVMWrapper, foldsFromCSV: Array[(Array[Int], Array[Int])], rows2: Seq[AggregatedRowNew]): (Array[Int], Array[Int]) = {
+  def svmControllerLinearSVM(svmInstance: LinearSVMWrapper, foldsFromCSV: Array[(Array[Int], Array[Int])], rows2: Seq[AggegatedRow]): (Array[Int], Array[Int]) = {
     val giantTruthTestLabel = new mutable.ArrayBuffer[Int]()
     val giantPredTestLabel = new mutable.ArrayBuffer[Int]()
     for((train,test) <- foldsFromCSV) {

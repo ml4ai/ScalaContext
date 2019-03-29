@@ -3,7 +3,8 @@ package org.ml4ai.data.classifiers
 import java.util.zip.GZIPInputStream
 
 import org.clulab.learning.LinearSVMClassifier
-import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, Utils}
+import org.ml4ai.data.utils.{AggegatedRow, Utils}
+import org.ml4ai.data.utils
 
 object SVMTrainSaveInstance extends App {
   //data preprocessing
@@ -11,7 +12,7 @@ object SVMTrainSaveInstance extends App {
   val untrainedModelFile = "./src/main/resources/svmUntrainedModel.dat"
   val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
   val svmInstance = new LinearSVMWrapper(SVMClassifier)
-  val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
+  val (allFeatures,rows) = AggegatedRow.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
   val nonNumericFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "")
   val numericFeatures = allFeatures.toSet -- nonNumericFeatures.toSet
   val featureDict = createFeaturesLists(numericFeatures.toSeq)
@@ -50,7 +51,7 @@ object SVMTrainSaveInstance extends App {
     map.toMap
   }
 
-  def extractDataByRelevantFeatures(featureSet:Seq[String], data:Seq[AggregatedRowNew]):Seq[AggregatedRowNew] = {
+  def extractDataByRelevantFeatures(featureSet:Seq[String], data:Seq[AggegatedRow]):Seq[AggegatedRow] = {
     val result = data.map(d => {
       val currentSent = d.sentenceIndex
       val currentPMCID = d.PMCID
@@ -69,7 +70,7 @@ object SVMTrainSaveInstance extends App {
         }
       })
       val valueList = indexList.map(i => currentFeatureValues(i))
-      AggregatedRowNew(currentSent, currentPMCID, currentEvtId, currentContextID, currentLabel, valueList.toArray, featureSet.toArray)
+      AggegatedRow(currentSent, currentPMCID, currentEvtId, currentContextID, currentLabel, valueList.toArray, featureSet.toArray)
     })
     result
   }

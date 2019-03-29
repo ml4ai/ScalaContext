@@ -1,7 +1,8 @@
 package org.ml4ai.data
 import java.io.InputStream
 import java.util.zip.GZIPInputStream
-import org.ml4ai.data.utils.oldDataPrep.InputRow
+
+import org.ml4ai.data.utils.InputRow
 import org.scalatest._
 
 import scala.io.Source

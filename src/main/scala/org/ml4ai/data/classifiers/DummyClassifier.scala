@@ -1,10 +1,11 @@
 package org.ml4ai.data.classifiers
-import org.ml4ai.data.utils.correctDataPrep.AggregatedRowNew
+
+import org.ml4ai.data.utils.AggegatedRow
 
 object DummyClassifier extends ClassifierMask {
-  override def fit(xTrain: Seq[AggregatedRowNew]):Unit = ()
+  override def fit(xTrain: Seq[AggegatedRow]):Unit = ()
 
-  override def predict(xTest: Seq[AggregatedRowNew]): Array[Int] = List.fill(xTest.size)(1).toArray
+  override def predict(xTest: Seq[AggegatedRow]): Array[Int] = List.fill(xTest.size)(1).toArray
 
   def convertBooleansToInt(labels: Seq[Boolean]):Array[Int] = {
 
@@ -15,7 +16,7 @@ object DummyClassifier extends ClassifierMask {
     toReturn.toArray
   }
 
-  def convertOptionalToBool(rows: Seq[AggregatedRowNew]): Seq[Boolean] = {
+  def convertOptionalToBool(rows: Seq[AggegatedRow]): Seq[Boolean] = {
     rows.map(x => x.label match {
       case Some(x) => x
       case _ => false

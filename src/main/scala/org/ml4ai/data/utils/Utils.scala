@@ -1,12 +1,10 @@
-package org.ml4ai.data.utils.correctDataPrep
+package org.ml4ai.data.utils
+
 import java.io._
 
-import scala.collection.mutable.StringBuilder
 import com.typesafe.scalalogging.LazyLogging
-import org.ml4ai.data.utils.correctDataPrep.AggregatedRowNew.{allOtherFeatures, indices, rectifyWrongFeatures}
 
 import scala.collection.mutable
-import scala.io.Source
 object Utils extends LazyLogging {
   def argMax(values:Map[Int, Double]):Int = {
     var bestK = Integer.MIN_VALUE
@@ -202,7 +200,7 @@ object Utils extends LazyLogging {
     finalPairings
   }
 
-  def featFreqMap(input: Seq[AggregatedRowNew], bestFeatureSet:Seq[String]):Map[String,Int]= {
+  def featFreqMap(input: Seq[AggegatedRow], bestFeatureSet:Seq[String]):Map[String,Int]= {
     val mut = collection.mutable.HashMap[String,Int]()
     for(i <- input){
       val currentFeatureSet = i.featureGroupNames
@@ -227,7 +225,7 @@ object Utils extends LazyLogging {
     }
   }
 
-  def writeFeatValsToFile(input:Seq[AggregatedRowNew], fileName:String):Unit = {
+  def writeFeatValsToFile(input:Seq[AggegatedRow], fileName:String):Unit = {
     val pw = new PrintWriter(new File(fileName))
     for(i <- input){
       val currentFeatureSet = i.featureGroupNames

@@ -1,8 +1,9 @@
 package org.ml4ai.data
 
-import org.ml4ai.data.utils.correctDataPrep.Balancer
-import org.ml4ai.data.utils.oldDataPrep.AggregatedRow
-import org.ml4ai.data.utils.oldDataPrep.InputRow
+// need to include tests for AggegatedRowNew class. I removed the existing once because old usage of AggegatedRow was deprecated
+// There will be only one instance of AggregatedRow, so please import that for testing like so:
+// import org.ml4ai.data.utils.AggregatedRow
+import org.ml4ai.data.utils.{Balancer, InputRow}
 import org.scalatest.{FlatSpec, Matchers}
 
 class TestDataAggregation extends FlatSpec with Matchers{
@@ -56,35 +57,6 @@ class TestDataAggregation extends FlatSpec with Matchers{
     }
 
     negatives should equal (34468)
-  }
-
-  "The aggregated data" should "have the right number of rows" in {
-    val aggregated = AggregatedRow.fromRows(Balancer.balanceByPaper(data, 1))
-    aggregated should have size 22761
-  }
-
-  it should "have the correct number of instances by label" in {
-    val aggregated = AggregatedRow.fromRows(Balancer.balanceByPaper(data, 1))
-
-    val positives = aggregated count {
-      case (_, row) =>
-        row.label match {
-          case Some(true) => true
-          case _ => false
-        }
-    }
-
-    positives should be (2556)
-
-    val negatives = aggregated count {
-      case (_, row) =>
-        row.label match {
-          case Some(false) => true
-          case _ => false
-        }
-    }
-
-    negatives should be (20205)
   }
 
 

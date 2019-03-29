@@ -1,16 +1,15 @@
 package org.ml4ai
 
 import java.util.zip._
-
+import com.typesafe.config.ConfigFactory
 import org.clulab.learning.LinearSVMClassifier
 import org.ml4ai.data.classifiers.LinearSVMWrapper
-import org.ml4ai.data.utils.correctDataPrep.{AggregatedRowNew, FoldMaker, Utils}
+import org.ml4ai.data.utils.{FoldMaker, Utils, AggegatedRow}
 
 import scala.io.Source
 
-// TODO Shraddha: Rename the class to a more informative name
-object Main extends App {
-  val (allFeatures,rows) = AggregatedRowNew.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
+object ML4AIPackageLauncher extends App {
+  val (allFeatures,rows) = AggegatedRow.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
   Utils.writeAllFeaturesToFile(allFeatures)
   Utils.writeHardcodedFeaturesToFile(allFeatures)
   val rows2 = rows.filter(_.PMCID != "b'PMC4204162'")
@@ -29,7 +28,7 @@ object Main extends App {
 
 
   // =========================== LINEAR SVM RESULTS ===========================
-  val fileName = "./src/main/resources/svmModel.dat"
+  val fileName = "./src/main/resources/svmUntrainedModel.dat"
 
   // svm instance using liblinear
   val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
