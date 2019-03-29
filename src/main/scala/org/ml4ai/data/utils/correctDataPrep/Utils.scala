@@ -71,7 +71,41 @@ object Utils extends LazyLogging {
     trainValCombined.toArray
   }
 
+  def createStats(nums: Iterable[Double]): (Double, Double, Double) = {
+    val min = nums.min
+    val max = nums.max
+    val avg = nums.sum / nums.size
+    (min, max, avg)
+  }
 
+  def extendFeatureName(f:String):(String, String, String) = {
+
+    val feat_min = s"${f}_min"
+    val feat_max = s"${f}_max"
+    val feat_avg = s"${f}_avg"
+    (feat_min, feat_max, feat_avg)
+
+  }
+
+  def writeHardcodedFeaturesToFile(allFeatures:Seq[String], fileName:String="./src/main/resources/hardCodedFeatures.txt"):Unit = {
+    def toInclude(s: String):Boolean = {
+      var truth = true
+      if(s.startsWith("evtDepTail")) truth = false
+      else if(s.startsWith("ctxDepTail")) truth = false
+      else if(s == "") truth = false
+      truth
+    }
+    val filtered = allFeatures.filter(toInclude(_)).toSet.toArray
+    val os = new ObjectOutputStream(new FileOutputStream(fileName))
+    os.writeObject(filtered.asInstanceOf[Array[String]])
+    os.close
+  }
+
+  def readHardcodedFeaturesFromFile(fileName: String):Array[String] = {
+    val is = new ObjectInputStream(new FileInputStream(fileName))
+    val headers = is.readObject().asInstanceOf[Array[String]]
+    headers
+  }
 
   def writeAllFeaturesToFile(allFeatures:Seq[String], fileName:String="./src/main/resources/allFeaturesFile.txt"):Unit = {
     //val fos = new FileOutputStream(fileName)
@@ -84,27 +118,11 @@ object Utils extends LazyLogging {
     str.append(allFeatures.last)
     val stringEquiv = str.toString()
     val arr = stringEquiv.split(",")
-    //val byteArr = arr.map(_.toByte)
-    println(arr.size + " : checking if split after append is correct")
     os.writeObject(arr.asInstanceOf[Array[String]])
     os.close()
   }
 
-  def createStats(nums: Iterable[Double]): (Double, Double, Double) = {
-    val min = nums.min
-    val max = nums.max
-    val avg = nums.sum / nums.size
-    (min, max, avg)
-  }
 
-  def extendFeatureName(f:String):(String, String, String) = {
-
-      val feat_min = s"${f}_min"
-      val feat_max = s"${f}_max"
-      val feat_avg = s"${f}_avg"
-      (feat_min, feat_max, feat_avg)
-
-  }
 
   def featureConstructor(file:String):(Seq[String], Map[String, Seq[String]]) = {
 //    val fileInputStream = new FileInputStream(file)
