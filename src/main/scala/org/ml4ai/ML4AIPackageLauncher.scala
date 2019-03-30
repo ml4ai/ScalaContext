@@ -1,19 +1,26 @@
 package org.ml4ai
 
-import java.util.zip._
 import com.typesafe.config.ConfigFactory
 import org.clulab.learning.LinearSVMClassifier
 import org.ml4ai.data.classifiers.LinearSVMWrapper
 import org.ml4ai.data.utils.{FoldMaker, Utils, AggegatedRow}
-
 import scala.io.Source
 
 object ML4AIPackageLauncher extends App {
-  val (allFeatures,rows) = AggegatedRow.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
-  Utils.writeAllFeaturesToFile(allFeatures)
-  Utils.writeHardcodedFeaturesToFile(allFeatures)
+
+  // *** DATA LOADING *****===========
+  val config = ConfigFactory.load()
+  val foldsPath = config.getString("folds.filePath")
+  val allFeatsPath = config.getString("features.allFeatures")
+  val groupedFeaturesPath = config.getString("features.groupedFeatures")
+  val hardCodedFeaturePath = config.getString("features.hardCodedFeatures")
+  val hardCodedInputRowFeatures = config.getString("features.hardCodedInputRowFeatures")
+  val (allFeatures,rows) = AggegatedRow.fromFile(groupedFeaturesPath)
+  Utils.writeAllFeaturesToFile(allFeatures, allFeatsPath)
+  Utils.writeHardcodedFeaturesToFile(hardCodedFeaturePath)
+  Utils.writeInputRowFeatures(hardCodedInputRowFeatures)
   val rows2 = rows.filter(_.PMCID != "b'PMC4204162'")
-  val bufferedFoldIndices = Source.fromFile("./src/main/resources/cv_folds_val_4.csv")
+  val bufferedFoldIndices = Source.fromFile(foldsPath)
   val foldsFromCSV = FoldMaker.getFoldsPerPaper(bufferedFoldIndices)
   val trainValCombined = Utils.combineTrainVal(foldsFromCSV)
 
@@ -28,18 +35,16 @@ object ML4AIPackageLauncher extends App {
 
 
   // =========================== LINEAR SVM RESULTS ===========================
-  val fileName = "./src/main/resources/svmUntrainedModel.dat"
+  val fileName = config.getString("svm.untrainedModel")
 
   // svm instance using liblinear
   val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
   val svmInstance = new LinearSVMWrapper(SVMClassifier)
   svmInstance.saveModel(fileName)
-  val loadedModel = svmInstance.loadFrom(fileName)
+  val loadedModelWrapper = svmInstance.loadFrom(fileName)
   // the loadedModel variable is an instance of LinearSVMWrapper. If you want access to the LinearSVMClassifier instance,
   // just call loadedModel.classifier.
-
-  //val (truthTestSVM, predTestSVM) = FoldMaker.svmControllerLinearSVM(svmInstance, trainValCombined.toArray, rows2)
-  val (truthTestSVM, predTestSVM) = FoldMaker.svmControllerLinearSVM(loadedModel, trainValCombined.toArray, rows2)
+  val (truthTestSVM, predTestSVM) = FoldMaker.svmControllerLinearSVM(loadedModelWrapper, trainValCombined, rows2)
   val svmResult = Utils.scoreMaker("Linear SVM", truthTestSVM, predTestSVM)
   scoreDictionary ++= svmResult
   //========================== CONCLUDING LINEAR SVM RESULTS ==========================

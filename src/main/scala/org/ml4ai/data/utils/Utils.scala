@@ -85,17 +85,19 @@ object Utils extends LazyLogging {
 
   }
 
-  def writeHardcodedFeaturesToFile(allFeatures:Seq[String], fileName:String="./src/main/resources/hardCodedFeatures.txt"):Unit = {
-    def toInclude(s: String):Boolean = {
-      var truth = true
-      if(s.startsWith("evtDepTail")) truth = false
-      else if(s.startsWith("ctxDepTail")) truth = false
-      else if(s == "") truth = false
-      truth
-    }
-    val filtered = allFeatures.filter(toInclude(_)).toSet.toArray
+  def writeInputRowFeatures(fileName:String): Unit = {
+    val listOfSpecsInputRow = Seq("PMCID", "label", "EvtID", "CtxID", "closesCtxOfClass", "context_frequency",
+      "evtNegationInTail", "evtSentenceFirstPerson", "evtSentencePastTense", "evtSentencePresentTense","ctxSentenceFirstPerson","ctxSentencePastTense", "ctxSentencePresentTense","ctxNegationIntTail","sentenceDistance", "dependencyDistance")
     val os = new ObjectOutputStream(new FileOutputStream(fileName))
-    os.writeObject(filtered.asInstanceOf[Array[String]])
+    os.writeObject(listOfSpecsInputRow.toArray)
+    os.close
+  }
+
+  def writeHardcodedFeaturesToFile(fileName: String):Unit = {
+    val listOfSpecificForAggregated = Seq("PMCID", "label", "EvtID", "CtxID", "closesCtxOfClass_min", "closesCtxOfClass_max", "closesCtxOfClass_avg", "context_frequency_min","context_frequency_max", "context_frequency_avg",
+      "evtNegationInTail_min","evtNegationInTail_max","evtNegationInTail_avg", "ctxNegationIntTail_min","ctxNegationIntTail_max","ctxNegationIntTail_avg","evtSentenceFirstPerson_min","evtSentenceFirstPerson_max","evtSentenceFirstPerson_avg", "evtSentencePastTense_min","evtSentencePastTense_max","evtSentencePastTense_avg", "evtSentencePresentTense_min","evtSentencePresentTense_max","evtSentencePresentTense_avg", "ctxSentencePresentTense_min","ctxSentencePresentTense_max","ctxSentencePresentTense_avg", "ctxSentencePastTense_max","ctxSentencePastTense_min", "ctxSentencePastTense_avg","ctxSentenceFirstPerson_min","ctxSentenceFirstPerson_min","ctxSentenceFirstPerson_min","sentenceDistance_min","sentenceDistance_max","sentenceDistance_avg", "dependencyDistance_min", "dependencyDistance_max", "dependencyDistance_avg")
+    val os = new ObjectOutputStream(new FileOutputStream(fileName))
+    os.writeObject(listOfSpecificForAggregated.toArray)
     os.close
   }
 
@@ -105,8 +107,7 @@ object Utils extends LazyLogging {
     headers
   }
 
-  // TODO Shradha: Remove the default value and load the path from the config file
-  def writeAllFeaturesToFile(allFeatures:Seq[String], fileName:String="./src/main/resources/allFeaturesFile.txt"):Unit = {
+  def writeAllFeaturesToFile(allFeatures:Seq[String], fileName:String):Seq[String] = {
     //val fos = new FileOutputStream(fileName)
     val os = new ObjectOutputStream(new FileOutputStream(fileName))
     val str = new mutable.StringBuilder()
@@ -119,20 +120,15 @@ object Utils extends LazyLogging {
     val arr = stringEquiv.split(",")
     os.writeObject(arr.asInstanceOf[Array[String]])
     os.close()
+    allFeatures
   }
 
 
 
   def featureConstructor(file:String):(Seq[String], Map[String, Seq[String]]) = {
-//    val fileInputStream = new FileInputStream(file)
-//    val sourceW = fileInputStream.asInstanceOf[InputStream]
-//    val source = Source.fromInputStream(sourceW)
-//    val lines = source.getLines()
-//    val headers = lines.next() split ","
     val is = new ObjectInputStream(new FileInputStream(file))
     val headers = is.readObject().asInstanceOf[Array[String]]
     val rectifiedHeaders = rectifyWrongFeatures(headers)
-    //source.close()
     is.close()
     (rectifiedHeaders, createBestFeatureSet(rectifiedHeaders))
   }

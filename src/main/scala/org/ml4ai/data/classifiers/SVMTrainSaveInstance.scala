@@ -1,33 +1,25 @@
 package org.ml4ai.data.classifiers
-
+import com.typesafe.config.ConfigFactory
 import java.util.zip.GZIPInputStream
 
 import org.clulab.learning.LinearSVMClassifier
 import org.ml4ai.data.utils.{AggegatedRow, Utils}
-import org.ml4ai.data.utils
+
 
 object SVMTrainSaveInstance extends App {
   //data preprocessing
-  val fileName = "./src/main/resources/svmTrainedModel.dat"
-  val untrainedModelFile = "./src/main/resources/svmUntrainedModel.dat"
+  val config = ConfigFactory.load()
+  val fileName = config.getString("svm.trainedModel")
   val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
   val svmInstance = new LinearSVMWrapper(SVMClassifier)
-  val (allFeatures,rows) = AggegatedRow.fromStream(new GZIPInputStream(getClass.getResourceAsStream("/grouped_features.csv.gz")))
+  val groupedFeatures = config.getString("features.groupedFeatures")
+  val (allFeatures,rows) = AggegatedRow.fromFile(groupedFeatures)
   val nonNumericFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "")
   val numericFeatures = allFeatures.toSet -- nonNumericFeatures.toSet
   val featureDict = createFeaturesLists(numericFeatures.toSeq)
   val bestFeatureSet = featureDict("NonDep_Context")
   val trainingDataPrior = rows.filter(_.PMCID != "b'PMC4204162'")
   val trainingData = extractDataByRelevantFeatures(bestFeatureSet, trainingDataPrior)
-  val (allFeat, bestFeatures) = Utils.featureConstructor("./src/main/resources/allFeaturesFile.txt")
-  // call frequency counter here on trainingData
-  //val map = Utils.featFreqMap(trainingData,  bestFeatures("All_features"))
-  //Utils.writeFeatFreqToFile(map, "./src/main/resources/featFreq_trainSave.txt")
-  //Utils.writeFeatValsToFile(trainingData, "./src/main/resources/featVals_trainSave.txt")
-
-  // saving untrained model to file
-  svmInstance.saveModel(untrainedModelFile)
-
 
   // training the machine learning model and writing it to file
   val trainingLabels = DummyClassifier.convertOptionalToBool(trainingData)

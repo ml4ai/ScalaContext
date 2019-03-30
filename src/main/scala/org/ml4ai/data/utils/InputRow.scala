@@ -1,6 +1,5 @@
 package org.ml4ai.data.utils
-
-// making sure git is clean and I can commit without issues
+import com.typesafe.config.ConfigFactory
 import java.io.InputStream
 
 import scala.collection.mutable
@@ -30,10 +29,9 @@ case class InputRow(
 
 object InputRow{
 
-  // TODO Shradha: Put this in a config file
-  private val listOfSpecificFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "closesCtxOfClass", "context_frequency",
-    "evtNegationInTail", "evtSentenceFirstPerson", "evtSentencePastTense", "evtSentencePresentTense","ctxSentenceFirstPerson","ctxSentencePastTense", "ctxSentencePresentTense","sentenceDistance", "dependencyDistance")
-
+  val config = ConfigFactory.load()
+  val hardCodedInputRowFeatures = config.getString("features.hardCodedInputRowFeatures")
+  private val listOfSpecificFeatures = Utils.readHardcodedFeaturesFromFile(hardCodedInputRowFeatures)
   private def allOtherFeatures(headers:Seq[String]): Set[String] = headers.toSet -- (listOfSpecificFeatures ++ Seq(""))
 
   private def indices(headers:Seq[String]): Map[String, Int] = headers.zipWithIndex.toMap

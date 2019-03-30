@@ -41,7 +41,7 @@ class TestInputCSV extends FlatSpec with Matchers{
 }
 
 object TestInputCSV {
-  val resourcePath = "/features.csv.gz"
+  val resourcePath = "/src/main/features/features.csv.gz"
 
   def getStream: InputStream = getClass.getResourceAsStream(resourcePath)
   def getGzipedStream = new GZIPInputStream(getStream)
