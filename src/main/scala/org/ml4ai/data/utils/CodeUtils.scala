@@ -5,7 +5,7 @@ import java.io._
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
-object Utils extends LazyLogging {
+object CodeUtils{
   def argMax(values:Map[Int, Double]):Int = {
     var bestK = Integer.MIN_VALUE
     var bestF1 = Double.MinValue
@@ -50,10 +50,10 @@ object Utils extends LazyLogging {
   }
 
   def scoreMaker(name: String, truthTest:Array[Int], predTest:Array[Int]):Map[String, (String, Double, Double, Double)] = {
-    val countsTest = Utils.predictCounts(truthTest, predTest)
-    val precTest = Utils.precision(countsTest)
-    val recallTest = Utils.recall(countsTest)
-    val f1Test = Utils.f1(countsTest)
+    val countsTest = CodeUtils.predictCounts(truthTest, predTest)
+    val precTest = CodeUtils.precision(countsTest)
+    val recallTest = CodeUtils.recall(countsTest)
+    val f1Test = CodeUtils.f1(countsTest)
     val testTup = ("test", precTest, recallTest, f1Test)
     val mapToReturn = Map(name -> testTup)
     mapToReturn
@@ -142,7 +142,7 @@ object Utils extends LazyLogging {
   def createBestFeatureSet(allFeatures:Seq[String]):Map[String, Seq[String]] = {
     val nonNumericFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "")
     val numericFeatures = allFeatures.toSet -- nonNumericFeatures.toSet
-    val featureDict = Utils.createFeatureDictionary(numericFeatures.toSeq)
+    val featureDict = CodeUtils.createFeatureDictionary(numericFeatures.toSeq)
     featureDict
   }
 

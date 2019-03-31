@@ -3,7 +3,7 @@ import com.typesafe.config.ConfigFactory
 import java.util.zip.GZIPInputStream
 
 import org.clulab.learning.LinearSVMClassifier
-import org.ml4ai.data.utils.{AggregatedRow, Utils}
+import org.ml4ai.data.utils.{AggregatedRow, CodeUtils}
 
 
 object SVMTrainSaveInstance extends App {

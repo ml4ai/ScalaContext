@@ -44,11 +44,11 @@ object FoldMaker {
         val trainInstance = new Baseline(k_val)
         val pred = trainInstance.predict(balancedTrainingData)
         val labelsToInt = trainInstance.createLabels(balancedTrainingData)
-        val counts = Utils.predictCounts(labelsToInt, pred)
-        val f1score = Utils.f1(counts)
+        val counts = CodeUtils.predictCounts(labelsToInt, pred)
+        val f1score = CodeUtils.f1(counts)
         kToF1Map += (k_val -> f1score)
       }
-      val bestK = Utils.argMax(kToF1Map.toMap)
+      val bestK = CodeUtils.argMax(kToF1Map.toMap)
       val testInstance = new Baseline(bestK)
       val testingData = test.collect{case x:Int => rows2(x)}
       val currentTruthTestInt = testInstance.createLabels(testingData)
