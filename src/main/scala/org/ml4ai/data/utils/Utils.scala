@@ -196,7 +196,7 @@ object Utils extends LazyLogging {
     finalPairings
   }
 
-  def featFreqMap(input: Seq[AggegatedRow], bestFeatureSet:Seq[String]):Map[String,Int]= {
+  def featFreqMap(input: Seq[AggregatedRow], bestFeatureSet:Seq[String]):Map[String,Int]= {
     val mut = collection.mutable.HashMap[String,Int]()
     for(i <- input){
       val currentFeatureSet = i.featureGroupNames
@@ -221,7 +221,7 @@ object Utils extends LazyLogging {
     }
   }
 
-  def writeFeatValsToFile(input:Seq[AggegatedRow], fileName:String):Unit = {
+  def writeFeatValsToFile(input:Seq[AggregatedRow], fileName:String):Unit = {
     val pw = new PrintWriter(new File(fileName))
     for(i <- input){
       val currentFeatureSet = i.featureGroupNames

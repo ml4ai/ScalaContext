@@ -1,11 +1,11 @@
 package org.ml4ai.data.classifiers
 
-import org.ml4ai.data.utils.AggegatedRow
+import org.ml4ai.data.utils.AggregatedRow
 
 case class Baseline(k:Int) extends ClassifierMask {
-  override def fit(xTrain: Seq[AggegatedRow]): Unit = {}
+  override def fit(xTrain: Seq[AggregatedRow]): Unit = {}
 
-  override def predict(xTest: Seq[AggegatedRow]): Array[Int] = {
+  override def predict(xTest: Seq[AggregatedRow]): Array[Int] = {
     val convert = dataConverter(xTest)
     val toPass = convert.map(s => s(0))
     deterministicSentenceDist(toPass, k)
@@ -20,7 +20,7 @@ case class Baseline(k:Int) extends ClassifierMask {
 
   override def loadFrom(fileName: String): LinearSVMWrapper = null
 
-  def dataConverter(data:Seq[AggegatedRow]):Array[Array[Double]] = {
+  def dataConverter(data:Seq[AggregatedRow]):Array[Array[Double]] = {
     // sentence distance is at index 18 in the row. We will extract the value at this index, create an array from it,
     // and then add it to the resulting value.
     val sentDistIndex = 18
@@ -31,7 +31,7 @@ case class Baseline(k:Int) extends ClassifierMask {
     result.toArray
   }
 
-  def createLabels(data:Seq[AggegatedRow]):Array[Int] = {
+  def createLabels(data:Seq[AggregatedRow]):Array[Int] = {
     val currentTruthTest = DummyClassifier.convertOptionalToBool(data)
     val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
     currentTruthTestInt

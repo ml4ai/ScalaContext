@@ -3,7 +3,7 @@ import com.typesafe.config.ConfigFactory
 import java.util.zip.GZIPInputStream
 
 import org.clulab.learning.LinearSVMClassifier
-import org.ml4ai.data.utils.{AggegatedRow, Utils}
+import org.ml4ai.data.utils.{AggregatedRow, Utils}
 
 
 object SVMTrainSaveInstance extends App {
@@ -13,7 +13,7 @@ object SVMTrainSaveInstance extends App {
   val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
   val svmInstance = new LinearSVMWrapper(SVMClassifier)
   val groupedFeatures = config.getString("features.groupedFeatures")
-  val (allFeatures,rows) = AggegatedRow.fromFile(groupedFeatures)
+  val (allFeatures,rows) = AggregatedRow.fromFile(groupedFeatures)
   val nonNumericFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "")
   val numericFeatures = allFeatures.toSet -- nonNumericFeatures.toSet
   val featureDict = createFeaturesLists(numericFeatures.toSeq)
@@ -43,7 +43,7 @@ object SVMTrainSaveInstance extends App {
     map.toMap
   }
 
-  def extractDataByRelevantFeatures(featureSet:Seq[String], data:Seq[AggegatedRow]):Seq[AggegatedRow] = {
+  def extractDataByRelevantFeatures(featureSet:Seq[String], data:Seq[AggregatedRow]):Seq[AggregatedRow] = {
     val result = data.map(d => {
       val currentSent = d.sentenceIndex
       val currentPMCID = d.PMCID
@@ -62,7 +62,7 @@ object SVMTrainSaveInstance extends App {
         }
       })
       val valueList = indexList.map(i => currentFeatureValues(i))
-      AggegatedRow(currentSent, currentPMCID, currentEvtId, currentContextID, currentLabel, valueList.toArray, featureSet.toArray)
+      AggregatedRow(currentSent, currentPMCID, currentEvtId, currentContextID, currentLabel, valueList.toArray, featureSet.toArray)
     })
     result
   }

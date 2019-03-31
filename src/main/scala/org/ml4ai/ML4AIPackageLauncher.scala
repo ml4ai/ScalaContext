@@ -3,7 +3,7 @@ package org.ml4ai
 import com.typesafe.config.ConfigFactory
 import org.clulab.learning.LinearSVMClassifier
 import org.ml4ai.data.classifiers.LinearSVMWrapper
-import org.ml4ai.data.utils.{FoldMaker, Utils, AggegatedRow}
+import org.ml4ai.data.utils.{FoldMaker, Utils, AggregatedRow}
 import scala.io.Source
 
 object ML4AIPackageLauncher extends App {
@@ -15,7 +15,7 @@ object ML4AIPackageLauncher extends App {
   val groupedFeaturesPath = config.getString("features.groupedFeatures")
   val hardCodedFeaturePath = config.getString("features.hardCodedFeatures")
   val hardCodedInputRowFeatures = config.getString("features.hardCodedInputRowFeatures")
-  val (allFeatures,rows) = AggegatedRow.fromFile(groupedFeaturesPath)
+  val (allFeatures,rows) = AggregatedRow.fromFile(groupedFeaturesPath)
   Utils.writeAllFeaturesToFile(allFeatures, allFeatsPath)
   Utils.writeHardcodedFeaturesToFile(hardCodedFeaturePath)
   Utils.writeInputRowFeatures(hardCodedInputRowFeatures)

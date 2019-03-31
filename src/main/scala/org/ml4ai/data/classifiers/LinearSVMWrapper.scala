@@ -3,13 +3,13 @@ import java.io._
 
 import org.clulab.struct.Counter
 import org.clulab.learning._
-import org.ml4ai.data.utils.AggegatedRow
+import org.ml4ai.data.utils.AggregatedRow
 case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends ClassifierMask { 
- override def fit(xTrain: Seq[AggegatedRow]): Unit = ()
+ override def fit(xTrain: Seq[AggregatedRow]): Unit = ()
 
   def fit(xTrain: RVFDataset[Int, String]):Unit = classifier.train(xTrain)
 
-  override def predict(data: Seq[AggegatedRow]): Array[Int] = {
+  override def predict(data: Seq[AggregatedRow]): Array[Int] = {
     val (_, individualRows) = dataConverter(data)
     individualRows.map(classifier.classOf(_))}
 
@@ -55,7 +55,7 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
     (dataSetToReturn, datumCollect.toArray)
   }
 
-  def constructTupsForRVF(rows: Seq[AggegatedRow]):Array[Array[(String, Double)]] = {
+  def constructTupsForRVF(rows: Seq[AggregatedRow]):Array[Array[(String, Double)]] = {
     val toReturn = collection.mutable.ListBuffer[Array[(String,Double)]]()
     rows.map(r => {
       val featureVals = r.featureGroups
@@ -66,7 +66,7 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
     toReturn.toArray
   }
 
-  def dataConverter(data:Seq[AggegatedRow], existingLabels: Option[Array[Int]] = None):(RVFDataset[Int, String], Array[RVFDatum[Int, String]]) = {
+  def dataConverter(data:Seq[AggregatedRow], existingLabels: Option[Array[Int]] = None):(RVFDataset[Int, String], Array[RVFDatum[Int, String]]) = {
     val tups = constructTupsForRVF(data)
     val labels = existingLabels match {
       case None => createLabels(data)
@@ -75,7 +75,7 @@ case class LinearSVMWrapper(classifier: LinearSVMClassifier[Int,String]) extends
     result
   }
 
-  def createLabels(data:Seq[AggegatedRow]):Array[Int] = {
+  def createLabels(data:Seq[AggregatedRow]):Array[Int] = {
     val currentTruthTest = DummyClassifier.convertOptionalToBool(data)
     val currentTruthTestInt = DummyClassifier.convertBooleansToInt(currentTruthTest)
     currentTruthTestInt

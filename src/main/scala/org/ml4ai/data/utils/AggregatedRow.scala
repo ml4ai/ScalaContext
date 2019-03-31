@@ -6,7 +6,7 @@ import scala.collection.mutable
 import scala.io.Source
 import scala.io.BufferedSource
 
-case class AggegatedRow(
+case class AggregatedRow(
                              sentenceIndex:Int,
                              PMCID:String,
                              EvtID: String,
@@ -16,7 +16,7 @@ case class AggegatedRow(
                              featureGroupNames:Array[String])
 
 
-object AggegatedRow {
+object AggregatedRow {
   val config = ConfigFactory.load()
   val hardCodedFeaturePath = config.getString("features.hardCodedFeatures")
   private val listOfSpecificFeatures = Utils.readHardcodedFeaturesFromFile(hardCodedFeaturePath)
@@ -24,7 +24,7 @@ object AggegatedRow {
     "evtNegationInTail_min","evtNegationInTail_max","evtNegationInTail_avg", "ctxNegationIntTail_min","ctxNegationIntTail_max","ctxNegationIntTail_avg","evtSentenceFirstPerson_min","evtSentenceFirstPerson_max","evtSentenceFirstPerson_avg", "evtSentencePastTense_min","evtSentencePastTense_max","evtSentencePastTense_avg", "evtSentencePresentTense_min","evtSentencePresentTense_max","evtSentencePresentTense_avg", "ctxSentencePresentTense_min","ctxSentencePresentTense_max","ctxSentencePresentTense_avg", "ctxSentencePastTense_max","ctxSentencePastTense_min", "ctxSentencePastTense_avg","ctxSentenceFirstPerson_min","ctxSentenceFirstPerson_min","ctxSentenceFirstPerson_min","sentenceDistance_min","sentenceDistance_max","sentenceDistance_avg", "dependencyDistance_min", "dependencyDistance_max", "dependencyDistance_avg")*/
   private def allOtherFeatures(headers:Seq[String]): Set[String] = headers.toSet -- (listOfSpecificFeatures ++ Seq(""))
   private def indices(headers:Seq[String]): Map[String, Int] = headers.zipWithIndex.toMap
-  def apply(str:String, headers: Seq[String], allOtherFeatures:Set[String], indices:Map[String, Int]):AggegatedRow = {
+  def apply(str:String, headers: Seq[String], allOtherFeatures:Set[String], indices:Map[String, Int]):AggregatedRow = {
     val rowData = str.split(",")
     val sentencePos = rowData(0).toInt
     var evt_dependencyTails = new mutable.ListBuffer[Double]
@@ -67,10 +67,10 @@ object AggegatedRow {
     featureGroups ++= ctx_dependencyTails
     featureNames ++= evt_dependencyFeatures
     featureNames ++= ctx_dependencyFeatures
-    AggegatedRow(sentencePos, pmcid, evt, ctx, Some(label.toBoolean), featureGroups.toArray, featureNames.toArray)
+    AggregatedRow(sentencePos, pmcid, evt, ctx, Some(label.toBoolean), featureGroups.toArray, featureNames.toArray)
   }
 
-  def fromFile(groupedFeaturesFileName: String):(Seq[String], Seq[AggegatedRow]) = {
+  def fromFile(groupedFeaturesFileName: String):(Seq[String], Seq[AggregatedRow]) = {
 
     val source = Source.fromFile(groupedFeaturesFileName)
     val lines = source.getLines()
@@ -78,7 +78,7 @@ object AggegatedRow {
     val rectifiedHeaders = rectifyWrongFeatures(headers)
     val features = allOtherFeatures(rectifiedHeaders)
     val ixs = indices(rectifiedHeaders)
-    val ret = lines.map(l => AggegatedRow(l, rectifiedHeaders, features, ixs)).toList
+    val ret = lines.map(l => AggregatedRow(l, rectifiedHeaders, features, ixs)).toList
     Utils.writeAllFeaturesToFile(rectifiedHeaders, hardCodedFeaturePath)
     source.close()
     (rectifiedHeaders, ret)
