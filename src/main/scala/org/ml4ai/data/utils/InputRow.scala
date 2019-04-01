@@ -20,7 +20,7 @@ case class InputRow(
 object InputRow{
 
   val config = ConfigFactory.load()
-  val hardCodedInputRowFeatures = config.getString("features.hardCodedInputRowFeatures")
+  val hardCodedInputRowFeatures = config.getString("features.hardCodedFeatures")
   private val listOfSpecificFeatures = CodeUtils.readHardcodedFeaturesFromFile(hardCodedInputRowFeatures)
   private def allOtherFeatures(headers:Seq[String]): Set[String] = headers.toSet -- (listOfSpecificFeatures ++ Seq(""))
 
