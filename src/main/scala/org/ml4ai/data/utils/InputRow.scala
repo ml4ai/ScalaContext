@@ -12,7 +12,6 @@ case class InputRow(
                      EvtID: String,
                      CtxID: String,
                      specificFeatureNames:Array[String],
-                     specificFeatureValues:Array[Double],
                      ctx_dependencyTails:Set[String],
                      evt_dependencyTails:Set[String]
                    )
@@ -51,12 +50,9 @@ object InputRow{
     val ctx = rowData(indices("CtxID"))
 
     val specificFeatureNames = collection.mutable.ListBuffer[String]()
-    val specificFeatureValues = collection.mutable.ListBuffer[Double]()
     val listOfNumericFeatures = listOfSpecificFeatures.drop(4)
     listOfNumericFeatures.map(l => {
       specificFeatureNames += l
-      val value = rowData(indices(l))
-      specificFeatureValues += value.toDouble
     })
     InputRow(sentencePos,
       pmcid,
@@ -64,7 +60,6 @@ object InputRow{
       evt,
       ctx,
       specificFeatureNames.toArray,
-      specificFeatureValues.toArray,
       ctx_dependencyTails.toSet,
       evt_dependencyTails.toSet)
   }

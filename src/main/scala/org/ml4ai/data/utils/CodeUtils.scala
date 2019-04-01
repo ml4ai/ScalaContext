@@ -151,9 +151,9 @@ object CodeUtils{
     map.toMap
   }
   // for every new feature, we add to a map of (featureName, (_min, _max, _sum, size))
-  def aggregateInputRowFeats(rows:Seq[String]):Map[String,(Double,Double, Double, Int)] = {
+  def aggregateInputRowFeats(features:Seq[String]):Map[String,(Double,Double, Double, Int)] = {
     val resultingMap = collection.mutable.Map[String,(Double,Double, Double, Int)]()
-    for(r <- rows) {
+    for(r <- features) {
       if(resultingMap.contains(r)) {
         val valueToBeAdded = 1.0
         val currentFeatDetails = resultingMap(r)
@@ -165,7 +165,6 @@ object CodeUtils{
 
       }
       else {
-        println(r + " : feature name from evt/ctx dep tail")
         val entry = (r -> (1.0,1.0,1.0,1))
         resultingMap += entry
       }
