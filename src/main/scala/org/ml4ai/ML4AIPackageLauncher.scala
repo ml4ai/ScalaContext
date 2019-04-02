@@ -15,6 +15,7 @@ object ML4AIPackageLauncher extends App {
   val groupedFeaturesPath = config.getString("features.groupedFeatures")
   val hardCodedFeaturePath = config.getString("features.hardCodedFeatures")
   val (allFeatures,rows) = AggregatedRow.fromFile(groupedFeaturesPath)
+  println(s"Size of new version of allFeatures: ${allFeatures.size}")
   CodeUtils.writeAllFeaturesToFile(allFeatures, allFeatsPath)
   CodeUtils.writeHardcodedFeaturesToFile(hardCodedFeaturePath)
   val rows2 = rows.filter(_.PMCID != "b'PMC4204162'")
