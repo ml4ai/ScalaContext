@@ -76,12 +76,12 @@ object AggregatedRow {
     val lines = source.getLines()
     val headers = lines.next() split ","
     val rectifiedHeaders = rectifyWrongFeatures(headers)
-    val resolved = CodeUtils.resolveUnaggregatedFeatureName(rectifiedHeaders, 5)
+    //val resolved = CodeUtils.resolveUnaggregatedFeatureName(rectifiedHeaders, 5)
     val features = allOtherFeatures(rectifiedHeaders)
     val ixs = indices(rectifiedHeaders)
     val ret = lines.map(l => AggregatedRow(l, rectifiedHeaders, features, ixs)).toList
     source.close()
-    (resolved, ret)
+    (rectifiedHeaders, ret)
   }
 
   def rectifyWrongFeatures(headers:Seq[String]): Seq[String] = {
