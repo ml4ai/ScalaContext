@@ -1,7 +1,8 @@
 package org.ml4ai.data.utils
-
+import scala.io.Source
 import java.io._
 
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable
@@ -127,7 +128,22 @@ object CodeUtils{
     allFeatures
   }
 
-
+  def fromFile(groupedFeaturesFileName: String):(Seq[String], Seq[AggregatedRow]) = {
+    val config = ConfigFactory.load()
+    val hardCodedFeaturePath = config.getString("features.hardCodedFeatures")
+    val listOfSpecificFeatures = readHardcodedFeaturesFromFile(hardCodedFeaturePath)
+    def allOtherFeatures(headers:Seq[String]): Set[String] = headers.toSet -- (listOfSpecificFeatures ++ Seq(""))
+    def indices(headers:Seq[String]): Map[String, Int] = headers.zipWithIndex.toMap
+    val source = Source.fromFile(groupedFeaturesFileName)
+    val lines = source.getLines()
+    val headers = lines.next() split ","
+    val rectifiedHeaders = rectifyWrongFeatures(headers)
+    val features = allOtherFeatures(rectifiedHeaders)
+    val ixs = indices(rectifiedHeaders)
+    val ret = lines.map(l => AggregatedRow(l, rectifiedHeaders, features, ixs)).toList
+    source.close()
+    (rectifiedHeaders, ret)
+  }
 
   def featureConstructor(file:String):(Seq[String], Map[String, Seq[String]]) = {
     val is = new ObjectInputStream(new FileInputStream(file))
