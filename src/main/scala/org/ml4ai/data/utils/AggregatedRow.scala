@@ -1,11 +1,6 @@
 package org.ml4ai.data.utils
 import com.typesafe.config.ConfigFactory
-import java.io.InputStream
-
 import scala.collection.mutable
-import scala.io.Source
-import scala.io.BufferedSource
-
 case class AggregatedRow(
                              sentenceIndex:Int,
                              PMCID:String,

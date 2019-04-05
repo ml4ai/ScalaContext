@@ -128,10 +128,8 @@ object CodeUtils{
     allFeatures
   }
 
-  def loadAggregatedRowsFromFile(groupedFeaturesFileName: String):(Seq[String], Seq[AggregatedRow]) = {
-    val config = ConfigFactory.load()
-    val hardCodedFeaturePath = config.getString("features.hardCodedFeatures")
-    val listOfSpecificFeatures = readHardcodedFeaturesFromFile(hardCodedFeaturePath)
+  def loadAggregatedRowsFromFile(groupedFeaturesFileName: String, hardCodedFilePath: String):(Seq[String], Seq[AggregatedRow]) = {
+    val listOfSpecificFeatures = readHardcodedFeaturesFromFile(hardCodedFilePath)
     def allOtherFeatures(headers:Seq[String]): Set[String] = headers.toSet -- (listOfSpecificFeatures ++ Seq(""))
     def indices(headers:Seq[String]): Map[String, Int] = headers.zipWithIndex.toMap
     val source = Source.fromFile(groupedFeaturesFileName)
