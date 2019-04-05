@@ -14,7 +14,7 @@ object ML4AIPackageLauncher extends App {
   val allFeatsPath = config.getString("features.allFeatures")
   val groupedFeaturesPath = config.getString("features.groupedFeatures")
   val hardCodedFeaturePath = config.getString("features.hardCodedFeatures")
-  val (allFeatures,rows) = CodeUtils.fromFile(groupedFeaturesPath)
+  val (allFeatures,rows) = CodeUtils.loadAggregatedRowsFromFile(groupedFeaturesPath)
   println(s"Size of new version of allFeatures: ${allFeatures.size}")
   CodeUtils.writeAllFeaturesToFile(allFeatures, allFeatsPath)
   CodeUtils.writeHardcodedFeaturesToFile(hardCodedFeaturePath)
