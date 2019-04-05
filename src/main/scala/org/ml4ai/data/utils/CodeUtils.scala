@@ -138,7 +138,7 @@ object CodeUtils{
     val rectifiedHeaders = rectifyWrongFeatures(headers)
     val features = allOtherFeatures(rectifiedHeaders)
     val ixs = indices(rectifiedHeaders)
-    val ret = lines.map(l => AggregatedRow(l, rectifiedHeaders, features, ixs)).toList
+    val ret = lines.map(l => AggregatedRow(l, rectifiedHeaders, features, ixs, listOfSpecificFeatures)).toList
     source.close()
     (rectifiedHeaders, ret)
   }

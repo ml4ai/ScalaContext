@@ -12,10 +12,7 @@ case class AggregatedRow(
 
 
 object AggregatedRow {
-  val config = ConfigFactory.load()
-  val hardCodedFeaturePath = config.getString("features.hardCodedFeatures")
-  private val listOfSpecificFeatures = CodeUtils.readHardcodedFeaturesFromFile(hardCodedFeaturePath)
-  def apply(str:String, headers: Seq[String], allOtherFeatures:Set[String], indices:Map[String, Int]):AggregatedRow = {
+  def apply(str: String, headers: Seq[String], allOtherFeatures: Set[String], indices: Map[String, Int], listOfSpecificFeatures: Array[String]):AggregatedRow = {
     val rowData = str.split(",")
     val sentencePos = rowData(0).toInt
     var evt_dependencyTails = new mutable.ListBuffer[Double]
