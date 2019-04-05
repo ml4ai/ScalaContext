@@ -20,8 +20,6 @@ object AggregatedRow {
   val config = ConfigFactory.load()
   val hardCodedFeaturePath = config.getString("features.hardCodedFeatures")
   private val listOfSpecificFeatures = CodeUtils.readHardcodedFeaturesFromFile(hardCodedFeaturePath)
-  private def allOtherFeatures(headers:Seq[String]): Set[String] = headers.toSet -- (listOfSpecificFeatures ++ Seq(""))
-  private def indices(headers:Seq[String]): Map[String, Int] = headers.zipWithIndex.toMap
   def apply(str:String, headers: Seq[String], allOtherFeatures:Set[String], indices:Map[String, Int]):AggregatedRow = {
     val rowData = str.split(",")
     val sentencePos = rowData(0).toInt
@@ -66,24 +64,5 @@ object AggregatedRow {
     featureNames ++= evt_dependencyFeatures
     featureNames ++= ctx_dependencyFeatures
     AggregatedRow(sentencePos, pmcid, evt, ctx, Some(label.toBoolean), featureGroups.toArray, featureNames.toArray)
-  }
-
-  def fromFile(groupedFeaturesFileName: String):(Seq[String], Seq[AggregatedRow]) = {
-
-    val source = Source.fromFile(groupedFeaturesFileName)
-    val lines = source.getLines()
-    val headers = lines.next() split ","
-    val rectifiedHeaders = rectifyWrongFeatures(headers)
-    val features = allOtherFeatures(rectifiedHeaders)
-    val ixs = indices(rectifiedHeaders)
-    val ret = lines.map(l => AggregatedRow(l, rectifiedHeaders, features, ixs)).toList
-    source.close()
-    (rectifiedHeaders, ret)
-  }
-
-  def rectifyWrongFeatures(headers:Seq[String]): Seq[String] = {
-    val result = collection.mutable.ListBuffer[String]()
-    headers.map(h => if(headers.indexOf(h) == 1) result += "PMCID" else result += h)
-    result
   }
 }

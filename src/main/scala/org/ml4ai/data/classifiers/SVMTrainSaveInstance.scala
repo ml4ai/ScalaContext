@@ -13,7 +13,7 @@ object SVMTrainSaveInstance extends App {
   val SVMClassifier = new LinearSVMClassifier[Int, String](C = 0.001, eps = 0.001, bias = false)
   val svmInstance = new LinearSVMWrapper(SVMClassifier)
   val groupedFeatures = config.getString("features.groupedFeatures")
-  val (allFeatures,rows) = AggregatedRow.fromFile(groupedFeatures)
+  val (allFeatures,rows) = CodeUtils.fromFile(groupedFeatures)
   val nonNumericFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "")
   val numericFeatures = allFeatures.toSet -- nonNumericFeatures.toSet
   val featureDict = createFeaturesLists(numericFeatures.toSeq)
