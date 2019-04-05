@@ -20,8 +20,6 @@ object AggregatedRow {
   val config = ConfigFactory.load()
   val hardCodedFeaturePath = config.getString("features.hardCodedFeatures")
   private val listOfSpecificFeatures = CodeUtils.readHardcodedFeaturesFromFile(hardCodedFeaturePath)
-/*  private val listOfSpecificFeatures = Seq("PMCID", "label", "EvtID", "CtxID", "closesCtxOfClass_min", "closesCtxOfClass_max", "closesCtxOfClass_avg", "context_frequency_min","context_frequency_max", "context_frequency_avg",
-    "evtNegationInTail_min","evtNegationInTail_max","evtNegationInTail_avg", "ctxNegationIntTail_min","ctxNegationIntTail_max","ctxNegationIntTail_avg","evtSentenceFirstPerson_min","evtSentenceFirstPerson_max","evtSentenceFirstPerson_avg", "evtSentencePastTense_min","evtSentencePastTense_max","evtSentencePastTense_avg", "evtSentencePresentTense_min","evtSentencePresentTense_max","evtSentencePresentTense_avg", "ctxSentencePresentTense_min","ctxSentencePresentTense_max","ctxSentencePresentTense_avg", "ctxSentencePastTense_max","ctxSentencePastTense_min", "ctxSentencePastTense_avg","ctxSentenceFirstPerson_min","ctxSentenceFirstPerson_min","ctxSentenceFirstPerson_min","sentenceDistance_min","sentenceDistance_max","sentenceDistance_avg", "dependencyDistance_min", "dependencyDistance_max", "dependencyDistance_avg")*/
   private def allOtherFeatures(headers:Seq[String]): Set[String] = headers.toSet -- (listOfSpecificFeatures ++ Seq(""))
   private def indices(headers:Seq[String]): Map[String, Int] = headers.zipWithIndex.toMap
   def apply(str:String, headers: Seq[String], allOtherFeatures:Set[String], indices:Map[String, Int]):AggregatedRow = {
@@ -76,7 +74,6 @@ object AggregatedRow {
     val lines = source.getLines()
     val headers = lines.next() split ","
     val rectifiedHeaders = rectifyWrongFeatures(headers)
-    //val resolved = CodeUtils.resolveUnaggregatedFeatureName(rectifiedHeaders, 5)
     val features = allOtherFeatures(rectifiedHeaders)
     val ixs = indices(rectifiedHeaders)
     val ret = lines.map(l => AggregatedRow(l, rectifiedHeaders, features, ixs)).toList
