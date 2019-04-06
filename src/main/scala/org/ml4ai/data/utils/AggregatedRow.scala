@@ -1,5 +1,4 @@
 package org.ml4ai.data.utils
-import com.typesafe.config.ConfigFactory
 import scala.collection.mutable
 case class AggregatedRow(
                              sentenceIndex:Int,
