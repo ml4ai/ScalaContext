@@ -31,9 +31,10 @@ object CodeUtils{
     else 0.0
   }
 
+
   def accuracy(preds:Map[String, Int]): Double = {
-    if ((preds("TP") + preds("FP") + preds("FN") + preds("TN")) == 0) 0.0
-    else (preds("TP") + preds("TN"))/(preds("TP") + preds("TN") + preds("FP") + preds("FN"))
+    if (!((preds("TP") + preds("FP") + preds("FN") + preds("TN")) == 0)) (preds("TP") + preds("TN")).toDouble/(preds("TP") + preds("TN") + preds("FP") + preds("FN")).toDouble
+    else 0.0
   }
 
   def predictCounts(yTrue: Array[Int], yPred: Array[Int]): Map[String, Int] = {
